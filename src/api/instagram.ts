@@ -395,11 +395,11 @@ export class Instagram<PostType> {
 
         // Close page
         if (!this.page.isClosed()) {
-            await this.page.close();
+            // await this.page.close();
         }
 
         if (!this.browserDisconnected && !this.browserInstance) {
-            await this.browser.close();
+            // await this.browser.close();
         }
     }
 
