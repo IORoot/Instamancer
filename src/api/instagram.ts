@@ -13,7 +13,8 @@ import {
     Page,
     Request,
     Response,
-} from "puppeteer";
+} from "puppeteer-extra";
+import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import * as winston from "winston";
 import {
     AsyncPluginEventsType,
