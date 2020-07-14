@@ -9,3 +9,4 @@ downloads/
 *.tgz
 *.log
 *.csv
+src/api/creds.json

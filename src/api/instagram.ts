@@ -25,6 +25,8 @@ import {
 } from "../../plugins";
 import {IOptions} from "./api";
 import {PostIdSet} from "./postIdSet";
+import creds from "./creds.json";
+
 
 type AsyncPluginFunctions = {
     [key in AsyncPluginEventsType]: ((...args: any[]) => Promise<void>)[];
@@ -90,7 +92,7 @@ export class Instagram<PostType> {
     public defaultPostURL: string = "https://www.instagram.com/p/";
 
     // Number of jumps before grafting
-    public jumpMod: number = 100;
+    public jumpMod: number = 1;
 
     // Depth of jumps
     public jumpSize: number = 2;
@@ -187,6 +189,10 @@ export class Instagram<PostType> {
         response: [],
     };
 
+    // AndyP added
+    public login: boolean = false;
+    public creds;
+
     /**
      * Create API wrapper instance
      * @param endpoint the url for the type of resource to scrape
@@ -228,6 +234,10 @@ export class Instagram<PostType> {
 
         this.addPlugins(options["plugins"]);
         this.executePlugins("construction");
+
+        // ANDYP - Login detection
+        this.login = false;
+        this.creds = creds;
     }
 
     /**
@@ -618,6 +628,46 @@ export class Instagram<PostType> {
             return;
         }
 
+        // ┌─────────────────────────────────────────────────────────────────────────┐ 
+        // │                                                                         │░
+        // │                                                                         │░
+        // │                         CHECK FOR LOGIN PAGE                            │░
+        // │                                                                         │░
+        // │                                                                         │░
+        // └─────────────────────────────────────────────────────────────────────────┘░
+        //  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+        if (data === undefined){
+            try {
+                /* istanbul ignore next */
+                data = await postPage.evaluate(async () => {
+
+                    await new Promise((resolve) => {
+                        let i = 0;
+                        const findSharedData = setInterval(() => {
+                            if (window["__additionalData"] !== undefined || i++ > 5) {
+                                resolve();
+                                clearInterval(findSharedData);
+                            }
+                        }, 2000);
+                    });
+                    
+                    return window["__additionalData"];                
+    
+                });
+            }
+            catch (error) /* istanbul ignore next */ {
+                await this.handlePostPageError(postPage, error, "Couldn't evaluate on page", post, retries);
+                return;
+            }
+
+            var page = "/p/" + post + "/";
+            var graphql = data[page]["data"]["graphql"];
+            this.logger.error('GRAPHQL -- ', { graphql });
+            data = JSON.stringify(graphql);
+        }
+
+
         // Close page
         await postPage.close();
 
@@ -823,6 +873,40 @@ export class Instagram<PostType> {
         // Attempt to visit URL
         try {
             await this.page.goto(this.url);
+
+            // ┌─────────────────────────────────────────────────────────────────────────┐ 
+            // │                                                                         │░
+            // │                                                                         │░
+            // │                         CHECK FOR LOGIN PAGE                            │░
+            // │                                                                         │░
+            // │                                                                         │░
+            // └─────────────────────────────────────────────────────────────────────────┘░
+            //  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+            try {
+                await this.page.waitForSelector('input[name="username"]', { timeout: 2000 });
+                this.logger.error("Login Page found, attempting to use credentials.");
+                this.login = true;
+                await this.page.type('input[name="username"]', creds['username']);
+                await this.page.type('input[name="password"]', creds['password']);
+                await this.page.waitFor(100);
+                await this.page.click('button[type="submit"]');
+                
+                // Save Details Button
+                await this.page.waitFor(3000);
+                await this.page.waitForSelector('button[type="button"]');
+                await this.page.click('button[type="button"]');
+
+                // Notifications button
+                await this.page.waitForSelector('button[tabindex="0"]');
+                await this.page.click('button[tabindex="0"]');
+
+                // Goto original URL Request, not login page.
+                await this.page.goto(this.url);
+                // await this.page.waitFor(3000);
+            } catch (error) {
+                this.logger.info("No LOGIN Screen found.");
+            }
+
 
             // Check page loads
             /* istanbul ignore next */
