@@ -13,8 +13,7 @@ import {
     Page,
     Request,
     Response,
-} from "puppeteer-extra";
-import StealthPlugin from 'puppeteer-extra-plugin-stealth';
+} from "puppeteer";
 import * as winston from "winston";
 import {
     AsyncPluginEventsType,
@@ -284,22 +283,91 @@ export class Instagram<PostType> {
             await this.start();
         }
 
-        while (true) {
-            // Get more posts
-            await this.getNext();
+        var index;
+        var a = [
+            "lonetraceur",
+            "shadezlat",
+            "airwipp",
+            "maxhenryparkour",
+            "movemendijsg",
+            "lynn_jung",
+            "deeenester",
+            "phoskygup",
+            "ampisound",
+            "kieparkour",
+            "joseph.hendo",
+            "max.motus",
+            "brewmanparkour",
+            "jaibattrick",
+            "shadezlat",
+            "airwipp",
+            "maxhenryparkour",
+            "movemendijsg",
+            "lynn_jung",
+            "deeenester",
+            "phoskygup",
+            "ampisound",
+            "kieparkour",
+            "joseph.hendo",
+            "max.motus",
+            "thebartlife",
+            "oleg.vorslav",
+            "stormfreerun",
+            "themotusprojects",
+            "drewftaylor",
+            "tim_champion",
+            "tobysegar",
+            "katiemcdonnell",
+            "alexxschauer",
+            "edscott1",
+            "maxstorrorcave",
+            "joescandrett",
+            "callumstorror",
+            "benjcave",
+            "teamfarang",
+            "storror",
+            "pashatheboss",
+            "domtomato",
+            "ovrhuman",
+            "streetmovementdk",
+            "sakjumps",
+            "axeldupre",
+            "nicovanhole",
+            "sebastienfoucan",
+            "kiellgram",
+            "georgia_munroe_pk",
+            "eric.moor",
+            "jannis_schauer",
+            "_philydee",
+            "joshuastorror",
+            "andi.woehle",
+            "brodiepawson"
+        ];
 
-            // Yield posts from buffer
-            let post = await this.postPop();
-            while (post) {
-                yield post;
-                post = await this.postPop();
-            }
+        for (index = 0; index < a.length; ++index) {
+            this.started = false;
+            this.index = 0;
+            this.id = a[index];
+            this.url = 'https://instagram.com/'+a[index];
+            await this.gotoPage();
+            await this.addListeners();
 
-            // End loop when finished, check for pagePromises if fullAPI
-            if (this.finished && this.pagePromises.length === 0) {
-                break;
+            while (true) {
+                // Get more posts
+                await this.getNext();
+                // Yield posts from buffer
+                let post = await this.postPop();
+                while (post) {
+                    yield post;
+                    post = await this.postPop();
+                }
+                // End loop when finished, check for pagePromises if fullAPI
+                if (this.finished && this.pagePromises.length === 0) {
+                    break;
+                }
             }
         }
+        
         await this.stop();
 
         // Add newline to end of output
@@ -307,6 +375,10 @@ export class Instagram<PostType> {
             process.stdout.write("\n");
         }
     }
+
+
+
+
 
     /**
      * Construct page and add listeners
@@ -325,9 +397,12 @@ export class Instagram<PostType> {
             throw new Error("Failed to visit URL");
         }
 
+    }
+
+    public async addListeners()
+    {
         // Build page and visit url
         await this.executePlugins("browser");
-
         this.started = true;
 
         // Add event listeners for requests and responses
@@ -354,12 +429,22 @@ export class Instagram<PostType> {
         }
     }
 
+
+
+
+
+
     /**
      * Match the url to the url used in API requests
      */
     public matchURL(url: string) {
         return url.startsWith(this.catchURL) && !url.includes("include_reel");
     }
+
+
+
+
+
 
     /**
      * Close the page and browser
@@ -404,6 +489,11 @@ export class Instagram<PostType> {
         }
     }
 
+
+
+
+
+
     /**
      * Finish retrieving data for the generator
      */
@@ -412,6 +502,11 @@ export class Instagram<PostType> {
         this.finishedReason = reason;
         this.logger.info("Finished collecting", {reason});
     }
+
+
+
+
+
 
     /**
      * Process the requests in the request buffer
@@ -474,6 +569,12 @@ export class Instagram<PostType> {
         }
     }
 
+
+
+
+
+
+
     /**
      * Process the responses in the response buffer
      */
@@ -534,6 +635,10 @@ export class Instagram<PostType> {
         this.responseBufferLock.release();
     }
 
+
+
+
+
     protected async processResponseData(data: unknown) {
         // Get posts
         const posts = _.get(data, this.edgeQuery, []);
@@ -566,6 +671,10 @@ export class Instagram<PostType> {
             }
         }
     }
+
+
+
+
 
     /**
      * Open a post in a new page, then extract its metadata
@@ -664,7 +773,7 @@ export class Instagram<PostType> {
 
             var page = "/p/" + post + "/";
             var graphql = data[page]["data"]["graphql"];
-            this.logger.error('GRAPHQL -- ', { graphql });
+            // this.logger.error('GRAPHQL -- ', { graphql });
             data = JSON.stringify(graphql);
         }
 
@@ -689,6 +798,9 @@ export class Instagram<PostType> {
         await this.executePlugins("postPage", parsed);
         await this.addToPostBuffer(parsed);
     }
+
+
+
 
     private async handlePostPageError(
         page: Page,
@@ -730,6 +842,10 @@ export class Instagram<PostType> {
             );
         }
     }
+
+
+
+
 
     /**
      * Stimulate the page until responses gathered
@@ -807,6 +923,10 @@ export class Instagram<PostType> {
         }
     }
 
+
+
+
+
     /**
      * Halt execution
      * @param time Seconds
@@ -823,6 +943,11 @@ export class Instagram<PostType> {
         this.sleepRemaining = 0;
         await this.progress(Progress.SCRAPING);
     }
+
+
+
+
+
 
     /**
      * Create the browser and page, then visit the url
@@ -848,8 +973,12 @@ export class Instagram<PostType> {
             options.executablePath = this.executablePath;
         }
 
+        // already got one.
+        if (this.browser) {
+
+        }
         // Launch browser
-        if (this.browserInstance) {
+        else if (this.browserInstance) {
             await this.progress(Progress.LAUNCHING);
             this.browser = this.browserInstance;
             this.browserDisconnected = !this.browser.isConnected();
@@ -866,6 +995,12 @@ export class Instagram<PostType> {
                 () => (this.browserDisconnected = true),
             );
         }
+
+        return true;
+    }
+
+    public async gotoPage()
+    {
 
         // New page
         this.page = await this.browser.newPage();
@@ -954,6 +1089,12 @@ export class Instagram<PostType> {
         return true;
     }
 
+
+
+
+
+
+
     /***
      * Handle errors that occur during page construction
      */
@@ -969,6 +1110,12 @@ export class Instagram<PostType> {
         }
         await this.browser.close();
     }
+
+
+
+
+
+
 
     /**
      * Pause and wait until resumed
@@ -988,6 +1135,10 @@ export class Instagram<PostType> {
         }
     }
 
+
+
+
+
     /**
      * Pop a post off the postBuffer (using locks). Returns null if no posts in buffer
      */
@@ -1000,6 +1151,11 @@ export class Instagram<PostType> {
         this.postBufferLock.release();
         return post;
     }
+
+
+
+
+
 
     /**
      * Print progress to stderr
@@ -1042,6 +1198,12 @@ export class Instagram<PostType> {
         this.writeLock.release();
     }
 
+
+
+
+
+
+    
     /**
      * Add request to the request buffer
      */
