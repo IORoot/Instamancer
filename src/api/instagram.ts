@@ -284,65 +284,9 @@ export class Instagram<PostType> {
         }
 
         var index;
-        var a = [
-            "lonetraceur",
-            "shadezlat",
-            "airwipp",
-            "maxhenryparkour",
-            "movemendijsg",
-            "lynn_jung",
-            "deeenester",
-            "phoskygup",
-            "ampisound",
-            "kieparkour",
-            "joseph.hendo",
-            "max.motus",
-            "brewmanparkour",
-            "jaibattrick",
-            "shadezlat",
-            "airwipp",
-            "maxhenryparkour",
-            "movemendijsg",
-            "lynn_jung",
-            "deeenester",
-            "phoskygup",
-            "ampisound",
-            "kieparkour",
-            "joseph.hendo",
-            "max.motus",
-            "thebartlife",
-            "oleg.vorslav",
-            "stormfreerun",
-            "themotusprojects",
-            "drewftaylor",
-            "tim_champion",
-            "tobysegar",
-            "katiemcdonnell",
-            "alexxschauer",
-            "edscott1",
-            "maxstorrorcave",
-            "joescandrett",
-            "callumstorror",
-            "benjcave",
-            "teamfarang",
-            "storror",
-            "pashatheboss",
-            "domtomato",
-            "ovrhuman",
-            "streetmovementdk",
-            "sakjumps",
-            "axeldupre",
-            "nicovanhole",
-            "sebastienfoucan",
-            "kiellgram",
-            "georgia_munroe_pk",
-            "eric.moor",
-            "jannis_schauer",
-            "_philydee",
-            "joshuastorror",
-            "andi.woehle",
-            "brodiepawson"
-        ];
+        var a = this.id;
+
+        this.logger.error("ANDYP ARRAY IS ", {a});
 
         for (index = 0; index < a.length; ++index) {
             this.started = false;
@@ -366,6 +310,8 @@ export class Instagram<PostType> {
                     break;
                 }
             }
+            // Close the profile page
+            await this.page.close();
         }
         
         await this.stop();

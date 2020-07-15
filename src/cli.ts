@@ -79,6 +79,15 @@ function buildParser(args, callback) {
             },
         )
         .command(
+            "users [ids]",
+            "Scrape comma-separated list of users",
+            {},
+            async (handleArgs) => {
+                await spawn(handleArgs);
+                callback();
+            },
+        )
+        .command(
             "post [ids]",
             "Scrape a comma-separated list of posts",
             {},
@@ -342,9 +351,18 @@ async function spawn(args) {
 
     // Pick endpoint
     let ids;
-    if (args["_"][0] === "post") {
+    if (args["_"][0] === "post" ){
         ids = args["ids"].split(",");
         args["id"] = ids.length === 1 ? ids[0] : "posts";
+        args["full"] = true;
+    } else {
+        ids = args["id"];
+    }
+
+    // NEW - USERS
+    if (args["_"][0] === "users" ){
+        ids = args["ids"].split(",");
+        args["id"] = ids.length === 1 ? ids[0] : "users";
         args["full"] = true;
     } else {
         ids = args["id"];

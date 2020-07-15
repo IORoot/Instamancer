@@ -124,31 +124,41 @@ export class Post extends Instagram<TSinglePost> {
     }
 }
 
+// Validator
 const getPageValidator = (options: IOptions) =>
     options.fullAPI ? FullApiPost : PostValidator;
 
+// Class Types
 export type InstagramPostClass = Hashtag<TPost> | User<TPost>;
 export type InstagramFullPostClass = Hashtag<TFullApiPost> | User<TFullApiPost>;
 
+// Instance - SEARCH
 export function createApi(
     type: "search",
     query: string,
     options?: ISearchOptions | ISearchOptionsPlugins<TSearchResult>,
 ): Search;
+
+// Instance - POST
 export function createApi(type: "post", id: string[], options?: IOptions): Post;
+
+// INSTANCE - HASHTAG & USER
 export function createApi(
-    type: "hashtag" | "user",
+    type: "hashtag" | "user" | "users",
     id: string,
     options?: IOptionsRegular | IOptionsRegularPlugins<InstagramPostClass>,
 ): InstagramPostClass;
+
+// INSTANCE - HASHTAG & USER
 export function createApi(
-    type: "hashtag" | "user",
+    type: "hashtag" | "user" | "users",
     id: string,
     options?: IOptionsFullApi | IOptionsFullApiPlugins<InstagramFullPostClass>,
 ): InstagramFullPostClass;
 
+// INSTANCE - HASHTAG & USER & POST & SEARCH
 export function createApi(
-    type: "hashtag" | "user" | "post" | "search",
+    type: "hashtag" | "user" | "post" | "search" | "users",
     id: string | string[],
     options?: IOptions,
 ): Post | InstagramPostClass | InstagramFullPostClass | Search {
@@ -162,6 +172,9 @@ export function createApi(
             ClassConstructor = Hashtag;
             break;
         case "user":
+            ClassConstructor = User;
+            break;
+        case "users":
             ClassConstructor = User;
             break;
     }
@@ -223,5 +236,50 @@ export class User<T> extends Instagram<T> {
             options,
             getPageValidator(options),
         );
+    }
+}
+
+/**
+ * An Instagram user API wrapper
+ */
+export class Users<T> extends Instagram<T> {
+
+    // Plugin to click the "Show more posts button."
+    defaultPageFunctions = [
+        /* istanbul ignore next */
+        () => {
+            let morePostsIntervalCounter = 0;
+            const morePostsInterval = setInterval(() => {
+                const searchDiv = Array.from(
+                    document.getElementsByTagName("div"),
+                ).filter((d) =>
+                    d.innerHTML.startsWith("Show More Posts from"),
+                )[0];
+
+                morePostsIntervalCounter++;
+
+                if (searchDiv !== undefined) {
+                    searchDiv.parentElement.parentElement.click();
+                    clearInterval(morePostsInterval);
+                } else if (morePostsIntervalCounter > 10) {
+                    clearInterval(morePostsInterval);
+                }
+            }, 1000);
+        },
+    ];
+
+    // User ids
+    private readonly ids: string[];
+
+    constructor(ids: string[], options: IOptions = {}) {
+        super(
+            "https://instagram.com/[id]",
+            ids[0],
+            "data.user.edge_owner_to_timeline_media.page_info",
+            "data.user.edge_owner_to_timeline_media.edges",
+            options,
+            getPageValidator(options),
+        );
+        this.ids = ids;
     }
 }
