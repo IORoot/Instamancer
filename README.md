@@ -2,7 +2,7 @@
 <img src="assets/logo.png" height="150" title="Icon made by Freepik (www.freepik.com) available at www.flaticon.com. CC 3.0 BY licensed (http://creativecommons.org/licenses/by/3.0/)">
 </p>
 
-<h1 align="center">Instamancer</h1>
+<h1 align="center">Instamancer+</h1>
 
 [![Build Status](https://img.shields.io/gitlab/pipeline/scriptsmith/instamancer)](https://gitlab.com/ScriptSmith/instamancer/pipelines)
 [![Quality](https://img.shields.io/codacy/grade/98066a13fa444845aa3902d180581b86.svg)](https://app.codacy.com/project/ScriptSmith/instamancer/dashboard)
@@ -12,7 +12,7 @@
 [![Dependencies](https://david-dm.org/scriptsmith/instamancer/status.svg)](https://david-dm.org/scriptsmith/instamancer)
 [![Chat](https://img.shields.io/gitter/room/instamancer/instamancer.svg)](https://gitter.im/instamancer)
 
-Scrape Instagram's API with Puppeteer.
+Scrape Instagram's API with Puppeteer. Now with login detection.
 
 ###### [Install](#Install) | [Usage](#Usage) | [Comparison](#Comparison) | [Website](https://scriptsmith.github.io/instamancer/) | [FAQ](FAQ.md) | [Examples](examples/README.md)
 
@@ -22,6 +22,9 @@ Instamancer is a new type of scraping tool that leverages Puppeteer's ability to
 Read more about how Instamancer works [here](https://scriptsmith.github.io/instamancer/).
 
 ### Features
+- Login detection
+- Single browser instance option.
+- Scrape multiple users.
 - Scrape hashtags, users' posts, and individual posts
 - Download images, albums, and videos
 - Output JSON, CSV
@@ -100,6 +103,11 @@ npm run build
 npm install -g
 ```
 
+### /src/api/creds.json
+
+If a login screen is detected, then use the creds.json file to login as that user and carry on.
+Copy the `creds_demo.json` to `creds.json` and enter real details to be used.
+
 ## Usage
 
 ### Command Line
@@ -110,6 +118,7 @@ Usage: instamancer <command> [options]
 Commands:
   instamancer hashtag [id]       Scrape a hashtag
   instamancer user [id]          Scrape a users posts
+  instamancer users [ids]        Scrape a comma-separated list of users posts
   instamancer post [ids]         Scrape a comma-separated list of posts
   instamancer search [query]     Perform a search of users, tags and places
   instamancer batch [batchfile]  Read newline-separated arguments from a file
@@ -163,8 +172,9 @@ Examples:
   instamancer user arianagrande --type=csv  Download Ariana Grande's posts to a
   --logging=info --visible                  CSV file with a non-headless
                                             browser, and log all events
-
-Source code available at https://github.com/ScriptSmith/instamancer
+  instamancer users arianagrande,therock    Download Ariana Grande's and the
+  -c 3                                      Rock's latest three posts.
+Source code available at https://github.com/IORoot/instamancer
 
 ```
 
@@ -193,6 +203,7 @@ import {createApi} from "instamancer"
 
 createApi("hashtag", id, options);
 createApi("user", id, options);
+createApi("users", ids, options);
 createApi("post", ids, options);
 createApi("search", query, options);
 ```
