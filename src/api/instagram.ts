@@ -92,7 +92,7 @@ export class Instagram<PostType> {
     public defaultPostURL: string = "https://www.instagram.com/p/";
 
     // Number of jumps before grafting
-    public jumpMod: number = 1;
+    public jumpMod: number = 100;
 
     // Depth of jumps
     public jumpSize: number = 2;
