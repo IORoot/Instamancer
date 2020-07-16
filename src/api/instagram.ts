@@ -192,6 +192,7 @@ export class Instagram<PostType> {
     // AndyP added
     public login: boolean = false;
     public creds;
+    public endpoint;
 
     /**
      * Create API wrapper instance
@@ -238,6 +239,7 @@ export class Instagram<PostType> {
         // ANDYP - Login detection
         this.login = false;
         this.creds = creds;
+        this.endpoint = endpoint;
     }
 
     /**
@@ -284,15 +286,22 @@ export class Instagram<PostType> {
         }
 
         var index;
-        var a = this.id;
 
-        this.logger.error("ANDYP ARRAY IS ", {a});
+        // Handle the difference between a single ID (string)
+        // and an Array of IDs.
+        var a = [];
+        a[0] = this.id; // Default to single ID and make it an array.
+        if (Array.isArray(this.id)) {
+            a = this.id; // If already an array, overwrite.
+        }
+
 
         for (index = 0; index < a.length; ++index) {
             this.started = false;
             this.index = 0;
             this.id = a[index];
-            this.url = 'https://instagram.com/'+a[index];
+            this.url = this.endpoint.replace("[id]", a[index]);
+
             await this.gotoPage();
             await this.addListeners();
 
@@ -310,6 +319,7 @@ export class Instagram<PostType> {
                     break;
                 }
             }
+
             // Close the profile page
             await this.page.close();
         }
