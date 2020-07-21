@@ -652,6 +652,7 @@ export class Instagram<PostType> {
         let parsed;
         try {
             await postPage.goto(this.postURL + post + "/");
+            await this.page.screenshot({path: '/var/www/vhosts/londonparkour.com/wp-content/uploads/screenshots/04_Page' + post + '.png'});
         } catch (error) {
             await this.handlePostPageError(
                 postPage,
@@ -697,7 +698,7 @@ export class Instagram<PostType> {
         // ┌─────────────────────────────────────────────────────────────────────────┐ 
         // │                                                                         │░
         // │                                                                         │░
-        // │                         CHECK FOR LOGIN PAGE                            │░
+        // │                    CHECK IF LOGIN PAGE WAS USED                         │░
         // │                                                                         │░
         // │                                                                         │░
         // └─────────────────────────────────────────────────────────────────────────┘░
@@ -982,21 +983,28 @@ export class Instagram<PostType> {
                 await this.page.type('input[name="password"]', creds['password']);
                 await this.page.waitFor(100);
                 await this.page.click('button[type="submit"]');
+                await this.page.waitFor(3000);
+                await this.page.screenshot({path: '/var/www/vhosts/londonparkour.com/wp-content/uploads/screenshots/01_login.png'});
+
                 
                 // Save Details Button
-                await this.page.waitFor(3000);
                 await this.page.waitForSelector('button[type="button"]');
                 await this.page.click('button[type="button"]');
+                await this.page.waitFor(500);
+                await this.page.screenshot({path: '/var/www/vhosts/londonparkour.com/wp-content/uploads/screenshots/02_details.png'});
 
                 // Notifications button
-                await this.page.waitForSelector('button[tabindex="0"]');
-                await this.page.click('button[tabindex="0"]');
-
+                //await this.page.waitForSelector('button[tabindex="0"]');
+                //await this.page.click('button[tabindex="0"]');
+                
                 // Goto original URL Request, not login page.
                 await this.page.goto(this.url);
+                await this.page.screenshot({path: '/var/www/vhosts/londonparkour.com/wp-content/uploads/screenshots/03_firstPage.png'});
                 // await this.page.waitFor(3000);
+
             } catch (error) {
                 this.logger.info("No LOGIN Screen found.");
+                await this.page.screenshot({path: '/var/www/vhosts/londonparkour.com/wp-content/uploads/screenshots/01_noLogin.png'});
             }
 
 
