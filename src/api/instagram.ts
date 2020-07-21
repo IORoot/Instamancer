@@ -652,7 +652,6 @@ export class Instagram<PostType> {
         let parsed;
         try {
             await postPage.goto(this.postURL + post + "/");
-            await this.page.screenshot({path: '/tmp/instamancer/04_Page' + post + '.png'});
         } catch (error) {
             await this.handlePostPageError(
                 postPage,
@@ -991,7 +990,7 @@ export class Instagram<PostType> {
                 await this.page.waitForSelector('button[type="button"]');
                 await this.page.click('button[type="button"]');
                 await this.page.waitFor(500);
-                await this.page.screenshot({path: '/tmp/instamancer/02_details.png'});
+                //await this.page.screenshot({path: '/tmp/instamancer/02_details.png'});
 
 
                 // Notifications button
