@@ -652,7 +652,7 @@ export class Instagram<PostType> {
         let parsed;
         try {
             await postPage.goto(this.postURL + post + "/");
-            await this.page.screenshot({path: '/var/www/vhosts/londonparkour.com/wp-content/uploads/screenshots/04_Page' + post + '.png'});
+            await this.page.screenshot({path: '/tmp/instamancer/04_Page' + post + '.png'});
         } catch (error) {
             await this.handlePostPageError(
                 postPage,
@@ -984,14 +984,15 @@ export class Instagram<PostType> {
                 await this.page.waitFor(100);
                 await this.page.click('button[type="submit"]');
                 await this.page.waitFor(3000);
-                await this.page.screenshot({path: '/var/www/vhosts/londonparkour.com/wp-content/uploads/screenshots/01_login.png'});
+                await this.page.screenshot({path: '/tmp/instamancer/01_login.png'});
 
                 
                 // Save Details Button
                 await this.page.waitForSelector('button[type="button"]');
                 await this.page.click('button[type="button"]');
                 await this.page.waitFor(500);
-                await this.page.screenshot({path: '/var/www/vhosts/londonparkour.com/wp-content/uploads/screenshots/02_details.png'});
+                await this.page.screenshot({path: '/tmp/instamancer/02_details.png'});
+
 
                 // Notifications button
                 //await this.page.waitForSelector('button[tabindex="0"]');
@@ -999,12 +1000,12 @@ export class Instagram<PostType> {
                 
                 // Goto original URL Request, not login page.
                 await this.page.goto(this.url);
-                await this.page.screenshot({path: '/var/www/vhosts/londonparkour.com/wp-content/uploads/screenshots/03_firstPage.png'});
+                await this.page.screenshot({path: '/tmp/instamancer/03_firstPage.png'});
                 // await this.page.waitFor(3000);
 
             } catch (error) {
                 this.logger.info("No LOGIN Screen found.");
-                await this.page.screenshot({path: '/var/www/vhosts/londonparkour.com/wp-content/uploads/screenshots/01_noLogin.png'});
+                await this.page.screenshot({path: '/tmp/instamancer/00_noLogin.png'});
             }
 
 
