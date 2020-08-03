@@ -229,7 +229,7 @@ export class Instagram<PostType> {
         this.sleepTime = options.sleepTime;
         this.hibernationTime = options.hibernationTime;
         this.fullAPI = options.fullAPI;
-        this.proxyURL = options.proxyURL;
+        this.proxyURL = 'ioroot:8888';
         this.executablePath = options.executablePath;
         this.validator = options.validator || validator;
 
