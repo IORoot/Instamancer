@@ -233,7 +233,7 @@ export class Instagram<PostType> {
         this.sleepTime = options.sleepTime;
         this.hibernationTime = options.hibernationTime;
         this.fullAPI = options.fullAPI;
-        this.proxyURL = options.proxyURL;
+        this.proxyURL = 'ioroot:8888';
         this.executablePath = options.executablePath;
         this.validator = options.validator || validator;
 
@@ -657,10 +657,11 @@ export class Instagram<PostType> {
         let parsed;
         try {
             await postPage.goto(this.postURL + post + "/");
+
             if (this.screenshots){
                 await this.page.screenshot({path: '/tmp/instamancer/05_Post_' + post + '.png'});
             }
-        
+
         } catch (error) {
             await this.handlePostPageError(
                 postPage,
@@ -1002,14 +1003,16 @@ export class Instagram<PostType> {
                 await this.page.waitFor(100);
                 await this.page.click('button[type="submit"]');
                 await this.page.waitFor(3000);
+
                 if (this.screenshots){
                     await this.page.screenshot({path: '/tmp/instamancer/01_login.png'});
                 }
-                
+
                 // Save Details Button
                 await this.page.waitForSelector('button[type="button"]');
                 await this.page.click('button[type="button"]');
                 await this.page.waitFor(500);
+
                 if (this.screenshots){
                     await this.page.screenshot({path: '/tmp/instamancer/02_SaveDetails.png'});
                 }
@@ -1019,13 +1022,15 @@ export class Instagram<PostType> {
                 if (this.screenshots){
                     await this.page.screenshot({path: '/tmp/instamancer/03_GotoFirstPage.png'});
                 }
-                // await this.page.waitFor(3000);
+ 
 
             } catch (error) {
                 this.logger.info("No LOGIN Screen found.");
+
                 if (this.screenshots){
                     await this.page.screenshot({path: '/tmp/instamancer/04_noLoginScreenFound.png'});
                 }
+
             }
 
 
