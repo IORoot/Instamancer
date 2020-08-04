@@ -73,6 +73,9 @@ export class Instagram<PostType> {
         if (options.total === undefined) {
             options.total = 0;
         }
+        if (options.screenshots === undefined) {
+            options.screenshots = false;
+        }
         return options;
     }
 
@@ -193,6 +196,7 @@ export class Instagram<PostType> {
     public login: boolean = false;
     public creds;
     public endpoint;
+    public screenshots;
 
     /**
      * Create API wrapper instance
@@ -240,6 +244,7 @@ export class Instagram<PostType> {
         this.login = false;
         this.creds = creds;
         this.endpoint = endpoint;
+        this.screenshots = options.screenshots;
     }
 
     /**
@@ -652,7 +657,10 @@ export class Instagram<PostType> {
         let parsed;
         try {
             await postPage.goto(this.postURL + post + "/");
-            await this.page.screenshot({path: '/var/www/vhosts/londonparkour.com/wp-content/uploads/screenshots/04_Page' + post + '.png'});
+            if (this.screenshots){
+                await this.page.screenshot({path: '/tmp/instamancer/05_Post_' + post + '.png'});
+            }
+        
         } catch (error) {
             await this.handlePostPageError(
                 postPage,
@@ -965,6 +973,16 @@ export class Instagram<PostType> {
 
         // Attempt to visit URL
         try {
+
+            if (this.proxyURL) {
+                this.logger.debug("PROXY URL: " + this.proxyURL);
+            }
+
+            if (this.screenshots){
+                await this.page.goto('https://ifconfig.co/');
+                await this.page.screenshot({path: '/tmp/instamancer/00_IPConfig.png'});
+            }
+
             await this.page.goto(this.url);
 
             // ┌─────────────────────────────────────────────────────────────────────────┐ 
@@ -984,27 +1002,30 @@ export class Instagram<PostType> {
                 await this.page.waitFor(100);
                 await this.page.click('button[type="submit"]');
                 await this.page.waitFor(3000);
-                await this.page.screenshot({path: '/var/www/vhosts/londonparkour.com/wp-content/uploads/screenshots/01_login.png'});
-
+                if (this.screenshots){
+                    await this.page.screenshot({path: '/tmp/instamancer/01_login.png'});
+                }
                 
                 // Save Details Button
                 await this.page.waitForSelector('button[type="button"]');
                 await this.page.click('button[type="button"]');
                 await this.page.waitFor(500);
-                await this.page.screenshot({path: '/var/www/vhosts/londonparkour.com/wp-content/uploads/screenshots/02_details.png'});
-
-                // Notifications button
-                //await this.page.waitForSelector('button[tabindex="0"]');
-                //await this.page.click('button[tabindex="0"]');
+                if (this.screenshots){
+                    await this.page.screenshot({path: '/tmp/instamancer/02_SaveDetails.png'});
+                }
                 
                 // Goto original URL Request, not login page.
                 await this.page.goto(this.url);
-                await this.page.screenshot({path: '/var/www/vhosts/londonparkour.com/wp-content/uploads/screenshots/03_firstPage.png'});
+                if (this.screenshots){
+                    await this.page.screenshot({path: '/tmp/instamancer/03_GotoFirstPage.png'});
+                }
                 // await this.page.waitFor(3000);
 
             } catch (error) {
                 this.logger.info("No LOGIN Screen found.");
-                await this.page.screenshot({path: '/var/www/vhosts/londonparkour.com/wp-content/uploads/screenshots/01_noLogin.png'});
+                if (this.screenshots){
+                    await this.page.screenshot({path: '/tmp/instamancer/04_noLoginScreenFound.png'});
+                }
             }
 
 

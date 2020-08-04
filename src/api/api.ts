@@ -64,6 +64,9 @@ export interface IOptionsCommon {
     // Pass puppeter Browser instance from outside.
     // Be careful to close Browser by yourself, when there is no need in it anymore.
     browserInstance?: Browser;
+
+    // Take debug screenshots
+    screenshots?: boolean;
 }
 
 export interface IOptionsFullApi extends IOptionsCommon {

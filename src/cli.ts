@@ -46,6 +46,8 @@ function getOptions(args, logger) {
         sleepTime: args["sleep"],
         strict: args["strict"],
         total: args["count"],
+        screenshots: args["screenshots"],
+        proxyURL: args["proxyURL"],
     };
 
     for (const pluginName of args["plugin"]) {
@@ -319,6 +321,19 @@ function buildParser(args, callback) {
                 describe: "Use a plugin from the plugins directory",
                 group: "Plugins",
             },
+            screenshots: {
+                alias: ["ss"],
+                boolean: true,
+                default: false,
+                describe: "Debugging screenshots in /tmp/instamancer/",
+                group: "Logging",
+            },
+            proxyURL: {
+                string: true,
+                default: '',
+                describe: "ProxyURL domain.com:8888",
+                group: "Proxy",
+            },
         })
         .demandCommand()
         .example(
@@ -427,6 +442,7 @@ async function spawn(args) {
     }
 
     // Start API
+    logger.info("proxyURL:" + options.proxyURL);
     logger.info("Starting API at " + Date.now());
     const obj = createApi(args["_"][0], ids, options);
     await obj.start();
