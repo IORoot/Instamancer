@@ -67,6 +67,12 @@ export interface IOptionsCommon {
 
     // Take debug screenshots
     screenshots?: boolean;
+
+    // Username
+    user?: string;
+
+    // Password
+    pass?: string;
 }
 
 export interface IOptionsFullApi extends IOptionsCommon {

@@ -48,6 +48,8 @@ function getOptions(args, logger) {
         total: args["count"],
         screenshots: args["screenshots"],
         proxyURL: args["proxyURL"],
+        user: args['user'],
+        pass: args['pass'],
     };
 
     for (const pluginName of args["plugin"]) {
@@ -322,17 +324,28 @@ function buildParser(args, callback) {
                 group: "Plugins",
             },
             screenshots: {
-                alias: ["ss"],
                 boolean: true,
                 default: false,
-                describe: "Debugging screenshots in /tmp/instamancer/",
-                group: "Logging",
+                describe: "Screenshots in /tmp/instamancer/",
+                group: "Extra",
             },
             proxyURL: {
                 string: true,
                 default: '',
                 describe: "ProxyURL domain.com:8888",
-                group: "Proxy",
+                group: "Extra",
+            },
+            user: {
+                string: true,
+                default: '',
+                describe: "Instagram Username",
+                group: "Extra",
+            },
+            pass: {
+                string: true,
+                default: '',
+                describe: "Instagram Password",
+                group: "Extra",
             },
         })
         .demandCommand()

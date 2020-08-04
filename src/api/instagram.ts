@@ -25,7 +25,8 @@ import {
 } from "../../plugins";
 import {IOptions} from "./api";
 import {PostIdSet} from "./postIdSet";
-import creds from "./creds.json";
+import { exit } from "process";
+// import creds from "./creds.json";
 
 
 type AsyncPluginFunctions = {
@@ -75,6 +76,12 @@ export class Instagram<PostType> {
         }
         if (options.screenshots === undefined) {
             options.screenshots = false;
+        }
+        if (options.user === undefined) {
+            options.user = '';
+        }
+        if (options.pass === undefined) {
+            options.pass = '';
         }
         return options;
     }
@@ -194,9 +201,11 @@ export class Instagram<PostType> {
 
     // AndyP added
     public login: boolean = false;
-    public creds;
+    // public creds;
     public endpoint;
     public screenshots;
+    public user;
+    public pass;
 
     /**
      * Create API wrapper instance
@@ -233,7 +242,7 @@ export class Instagram<PostType> {
         this.sleepTime = options.sleepTime;
         this.hibernationTime = options.hibernationTime;
         this.fullAPI = options.fullAPI;
-        this.proxyURL = 'ioroot:8888';
+        this.proxyURL = options.proxyURL;
         this.executablePath = options.executablePath;
         this.validator = options.validator || validator;
 
@@ -242,7 +251,9 @@ export class Instagram<PostType> {
 
         // ANDYP - Login detection
         this.login = false;
-        this.creds = creds;
+        // this.creds = creds;
+        this.user = options.user;
+        this.pass = options.pass;
         this.endpoint = endpoint;
         this.screenshots = options.screenshots;
     }
@@ -998,8 +1009,21 @@ export class Instagram<PostType> {
                 await this.page.waitForSelector('input[name="username"]', { timeout: 2000 });
                 this.logger.error("Login Page found, attempting to use credentials.");
                 this.login = true;
-                await this.page.type('input[name="username"]', creds['username']);
-                await this.page.type('input[name="password"]', creds['password']);
+
+                if (this.user == '')
+                {
+                    this.logger.error("No Username Supplied. Exiting");
+                    return false;
+                }
+                if (this.pass == '')
+                {
+                    this.logger.error("No Password Supplied. Exiting");
+                    return false;
+                }
+
+                await this.page.type('input[name="username"]', this.user);
+                await this.page.type('input[name="password"]', this.pass);
+
                 await this.page.waitFor(100);
                 await this.page.click('button[type="submit"]');
                 await this.page.waitFor(3000);
