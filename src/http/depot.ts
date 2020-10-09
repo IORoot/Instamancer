@@ -45,10 +45,10 @@ export async function depot(
             method: "PUT",
             ...authURL(uploadUrl),
         }).catch((error) => {
-            this.logger.error(`Uploading ${url} failed`, error);
+            this.logger.warn(`Uploading ${url} failed`, error);
         });
     } catch (e) {
-        this.logger.error(`Uploading ${url} failed`, e);
+        this.logger.warn(`Uploading ${url} failed`, e);
     }
 }
 

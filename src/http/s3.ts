@@ -42,14 +42,14 @@ export async function s3(
                 },
                 (err) => {
                     if (err !== null) {
-                        this.logger.error(`Uploading ${url} failed`, err);
+                        this.logger.warn(`Uploading ${url} failed`, err);
                     }
                     resolve();
                 },
             );
         });
     } catch (e) {
-        this.logger.error(`Uploading ${url} failed`, e);
+        this.logger.warn(`Uploading ${url} failed`, e);
     }
 }
 
@@ -82,7 +82,7 @@ async function uploadFile(
             },
             (err) => {
                 if (err !== null) {
-                    this.logger.error(`Uploading ${filePath} failed`, err);
+                    this.logger.warn(`Uploading ${filePath} failed`, err);
                 }
                 resolve();
             },

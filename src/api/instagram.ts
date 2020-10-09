@@ -383,7 +383,7 @@ export class Instagram<PostType> {
         this.page.on("response", (res) => this.interceptResponse(res));
         this.page.on("requestfailed", (res) => this.interceptFailure(res));
         this.page.on("console", (message) =>
-            this.logger.info("Console log", {message}),
+            this.logger.warn("Console log", {message}),
         );
 
         // Ignore dialog boxes
@@ -392,7 +392,7 @@ export class Instagram<PostType> {
         // Log errors
         /* istanbul ignore next */
         this.page.on("error", (error) =>
-            this.logger.error("Console error", {error}),
+            this.logger.warn("Console error", {error}),
         );
 
         // Gather initial posts from web page
@@ -567,11 +567,11 @@ export class Instagram<PostType> {
             try {
                 data = await res.json();
                 if (typeof data !== "object") {
-                    this.logger.error("Response data is not an object", {data});
+                    this.logger.warn("Response data is not an object", {data});
                     continue;
                 }
             } catch (error) {
-                this.logger.error("Error processing response JSON", {
+                this.logger.warn("Error processing response JSON", {
                     data,
                     error,
                 });
@@ -583,7 +583,7 @@ export class Instagram<PostType> {
 
             // Check for rate limiting
             if (data && "status" in data && data["status"] === "fail") {
-                this.logger.info("Rate limited");
+                this.logger.warn("Rate limited");
                 this.hibernate = true;
                 continue;
             }
@@ -595,7 +595,7 @@ export class Instagram<PostType> {
                     _.get(data, this.pageQuery + ".end_cursor", false)
                 )
             ) {
-                this.logger.info("No posts remaining", {data});
+                this.logger.warn("No posts remaining", {data});
                 this.finish(FinishedReasons.API_FINISHED);
             }
 
@@ -620,7 +620,7 @@ export class Instagram<PostType> {
             // Check it hasn't already been cached
             const contains = this.postIds.add(postId);
             if (contains) {
-                this.logger.info("Duplicate id found", {postId});
+                this.logger.warn("Duplicate id found", {postId});
                 continue;
             }
 
@@ -670,10 +670,14 @@ export class Instagram<PostType> {
             await postPage.goto(this.postURL + post + "/");
 
             if (this.screenshots){
-                await this.page.screenshot({path: '/tmp/instamancer/05_Post_' + post + '.png'});
+                await this.page.screenshot({path: '/tmp/instamancer/06_Post_' + post + '.png'});
+                this.logger.error( Date.now() + ', Screenshot, postCaptured, /tmp/instamancer/06_Post_' + post + '.png' );
             }
 
         } catch (error) {
+
+            this.logger.error(Date.now() + ", Error, Navigate, Could not navigate to Post Page: " + this.postURL + post + "/" );
+
             await this.handlePostPageError(
                 postPage,
                 error,
@@ -750,7 +754,7 @@ export class Instagram<PostType> {
 
             var page = "/p/" + post + "/";
             var graphql = data[page]["data"]["graphql"];
-            // this.logger.error('GRAPHQL -- ', { graphql });
+            // this.logger.warn('GRAPHQL -- ', { graphql });
             data = JSON.stringify(graphql);
         }
 
@@ -787,7 +791,7 @@ export class Instagram<PostType> {
         retries: number,
     ) {
         // Log error and wait
-        this.logger.error(message, {error});
+        this.logger.warn(message, {error});
         await this.progress(Progress.ABORTED);
         await this.sleep(2);
 
@@ -812,9 +816,9 @@ export class Instagram<PostType> {
             const validationReporter = PathReporter.report(validationResult);
             this.logger.warn(
                 `
-      Warning! The Instagram API has been changed since this version of instamancer was released.
-      More info: https://scriptsmith.github.io/instamancer/api-change
-      `,
+        Warning! The Instagram API has been changed since this version of instamancer was released.
+        More info: https://scriptsmith.github.io/instamancer/api-change
+        `,
                 {validationReporter, post},
             );
         }
@@ -868,7 +872,7 @@ export class Instagram<PostType> {
                         // No content
                     }
 
-                    this.logger.error(
+                    this.logger.warn(
                         "Page failed to make requests",
                         pageContent,
                     );
@@ -979,6 +983,8 @@ export class Instagram<PostType> {
     public async gotoPage()
     {
 
+        this.logger.error( Date.now() + ", START, process, visiting new page.");
+
         // New page
         this.page = await this.browser.newPage();
         await this.progress(Progress.OPENING);
@@ -987,12 +993,13 @@ export class Instagram<PostType> {
         try {
 
             if (this.proxyURL) {
-                this.logger.debug("PROXY URL: " + this.proxyURL);
+                this.logger.error(Date.now() + ", Proxy, url, " + this.proxyURL);
             }
 
             if (this.screenshots){
                 await this.page.goto('https://ifconfig.co/');
                 await this.page.screenshot({path: '/tmp/instamancer/00_IPConfig.png'});
+                this.logger.error( Date.now() + ", Screenshot, IPConfig, /tmp/instamancer/00_IPConfig.png");
             }
 
             await this.page.goto(this.url);
@@ -1006,18 +1013,33 @@ export class Instagram<PostType> {
             // └─────────────────────────────────────────────────────────────────────────┘░
             //  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
             try {
+
+                /**
+                 * Accept Cookies
+                 */
+                if (this.screenshots){
+                    await this.page.screenshot({path: '/tmp/instamancer/01_LookingForCookies.png'});
+                    this.logger.error(Date.now() + ", Screenshot, cookieAccept, /tmp/instamancer/01_LookingForCookies.png" );
+                }
+                await this.page.waitForSelector('div[role=dialog] button:first-of-type', { timeout: 500 });
+                this.logger.error(Date.now() + ", Cookies, Accept, Cookie Popup found - attempting to press accept button." );
+                await this.page.click('div[role=dialog] button:first-of-type');
+
+                /**
+                 * Login Page
+                 */
                 await this.page.waitForSelector('input[name="username"]', { timeout: 2000 });
-                this.logger.error("Login Page found, attempting to use credentials.");
+                this.logger.error(Date.now() + ", Login, Attempt, Login Page found - attempting to use credentials." );
                 this.login = true;
 
                 if (this.user == '')
                 {
-                    this.logger.error("No Username Supplied. Exiting");
+                    this.logger.error(Date.now() + ", Error, Password, No Username Supplied. Exiting" );
                     return false;
                 }
                 if (this.pass == '')
                 {
-                    this.logger.error("No Password Supplied. Exiting");
+                    this.logger.error(Date.now() + ", Error, Password, No Password Supplied. Exiting" );
                     return false;
                 }
 
@@ -1029,30 +1051,38 @@ export class Instagram<PostType> {
                 await this.page.waitFor(3000);
 
                 if (this.screenshots){
-                    await this.page.screenshot({path: '/tmp/instamancer/01_login.png'});
+                    await this.page.screenshot({path: '/tmp/instamancer/02_login.png'});
+                    this.logger.error(Date.now() + ", Screenshot, login, /tmp/instamancer/02_login.png" );
                 }
 
-                // Save Details Button
+                /**
+                 * Save Details Button
+                 */
                 await this.page.waitForSelector('button[type="button"]');
                 await this.page.click('button[type="button"]');
                 await this.page.waitFor(500);
 
                 if (this.screenshots){
-                    await this.page.screenshot({path: '/tmp/instamancer/02_SaveDetails.png'});
+                    await this.page.screenshot({path: '/tmp/instamancer/03_SaveDetails.png'});
+                    this.logger.error(Date.now() + ", Screenshot, saveDetails, /tmp/instamancer/03_SaveDetails.png" );
                 }
                 
-                // Goto original URL Request, not login page.
+                /**
+                 *  Goto original URL Request, not login page.
+                 */
                 await this.page.goto(this.url);
                 if (this.screenshots){
-                    await this.page.screenshot({path: '/tmp/instamancer/03_GotoFirstPage.png'});
+                    await this.page.screenshot({path: '/tmp/instamancer/04_GotoFirstPage.png'});
+                    this.logger.error(Date.now() + ", Screenshot, firstPage, /tmp/instamancer/04_GotoFirstPage.png" );
                 }
- 
+
 
             } catch (error) {
                 this.logger.info("No LOGIN Screen found.");
 
                 if (this.screenshots){
-                    await this.page.screenshot({path: '/tmp/instamancer/04_noLoginScreenFound.png'});
+                    await this.page.screenshot({path: '/tmp/instamancer/05_noLoginScreenFound.png'});
+                    this.logger.error(Date.now() + ", Screenshot, noLogin, /tmp/instamancer/05_noLoginScreenFound.png" );
                 }
 
             }
@@ -1092,7 +1122,7 @@ export class Instagram<PostType> {
                     try {
                         document.body.style.overflow = "";
                     } catch (error) {
-                        this.logger.error("Failed to update style", {error});
+                        this.logger.warn("Failed to update style", {error});
                     }
                 }, 10000);
             });
@@ -1114,7 +1144,7 @@ export class Instagram<PostType> {
      */
     private async handleConstructionError(error: string, timeout: number) {
         // Log error and wait
-        this.logger.error("Construction error", {error, url: this.url});
+        this.logger.warn("Construction error", {error, url: this.url});
         await this.progress(Progress.ABORTED);
         await this.sleep(timeout);
 
@@ -1195,7 +1225,7 @@ export class Instagram<PostType> {
         );
         const indexStr = chalk.bgWhite.black(` Scraped: ${this.index} `);
 
-        this.logger.debug({
+        this.logger.warn({
             id: this.id,
             index: this.index,
             sleepRemaining: this.sleepRemaining,
@@ -1240,7 +1270,7 @@ export class Instagram<PostType> {
      * Log failed requests
      */
     private async interceptFailure(req: Request) {
-        this.logger.info("Failed request", {url: req.url()});
+        this.logger.warn("Failed request", {url: req.url()});
         await this.progress(Progress.ABORTED);
     }
 

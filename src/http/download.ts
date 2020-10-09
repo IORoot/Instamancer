@@ -41,8 +41,8 @@ export async function download(
             stream.on("finish", resolve);
         });
     } catch (e) {
-        this.logger.info(`Downloading ${url} failed`);
-        this.logger.debug(e);
+        this.logger.warn(`Downloading ${url} failed`);
+        this.logger.warn(e);
     }
 }
 
