@@ -667,7 +667,10 @@ export class Instagram<PostType> {
         // Visit post and read state
         let parsed;
         try {
+            
+            this.logger.error( Date.now() + ", URL, visit, visiting page : " + this.postURL + post + "/");
             await postPage.goto(this.postURL + post + "/");
+            this.logger.error( Date.now() + ", URL, visit, visiting page loaded : " + postPage.url());
 
             if (this.screenshots){
                 await this.page.screenshot({path: '/tmp/instamancer/06_Post_' + post + '.png'});
@@ -983,7 +986,7 @@ export class Instagram<PostType> {
     public async gotoPage()
     {
 
-        this.logger.error( Date.now() + ", START, process, visiting new page.");
+        this.logger.error( Date.now() + ", START, process, visiting new page. ");
 
         // New page
         this.page = await this.browser.newPage();
@@ -997,12 +1000,15 @@ export class Instagram<PostType> {
             }
 
             if (this.screenshots){
-                await this.page.goto('https://ifconfig.co/');
+                this.logger.error( Date.now() + ", URL, visit, visiting page : http://thismachine.info/");
+                await this.page.goto('http://thismachine.info/');
                 await this.page.screenshot({path: '/tmp/instamancer/00_IPConfig.png'});
                 this.logger.error( Date.now() + ", Screenshot, IPConfig, /tmp/instamancer/00_IPConfig.png");
             }
 
+            this.logger.error( Date.now() + ", URL, visit, visiting page : "+this.url);
             await this.page.goto(this.url);
+            this.logger.error( Date.now() + ", URL, loaded, visiting page loaded : "+this.page.url());
 
             // ┌─────────────────────────────────────────────────────────────────────────┐ 
             // │                                                                         │░
@@ -1070,7 +1076,10 @@ export class Instagram<PostType> {
                 /**
                  *  Goto original URL Request, not login page.
                  */
+                this.logger.error( Date.now() + ", URL, visit, visiting page : "+this.url);
                 await this.page.goto(this.url);
+                this.logger.error( Date.now() + ", URL, loaded, visiting page loaded : "+this.page.url());
+
                 if (this.screenshots){
                     await this.page.screenshot({path: '/tmp/instamancer/04_GotoFirstPage.png'});
                     this.logger.error(Date.now() + ", Screenshot, firstPage, /tmp/instamancer/04_GotoFirstPage.png" );
