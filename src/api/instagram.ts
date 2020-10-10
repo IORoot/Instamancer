@@ -1087,6 +1087,7 @@ export class Instagram<PostType> {
 
 
             } catch (error) {
+                await this.page.waitFor(3000);
                 this.logger.info("No LOGIN Screen found.");
 
                 if (this.screenshots){
