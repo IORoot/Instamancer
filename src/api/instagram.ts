@@ -1000,8 +1000,8 @@ export class Instagram<PostType> {
             }
 
             if (this.screenshots){
-                this.logger.error( Date.now() + ", URL, visit, visiting page : http://thismachine.info/");
-                await this.page.goto('http://thismachine.info/');
+                this.logger.error( Date.now() + ", URL, visit, visiting page : http://atomurl.net/myip/");
+                await this.page.goto('http://atomurl.net/myip/');
                 await this.page.screenshot({path: '/tmp/instamancer/00_IPConfig.png'});
                 this.logger.error( Date.now() + ", Screenshot, IPConfig, /tmp/instamancer/00_IPConfig.png");
             }
