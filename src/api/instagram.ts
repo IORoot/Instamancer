@@ -1164,7 +1164,7 @@ export class Instagram<PostType> {
 
 
 
-                // await this.page.waitFor(3000);
+                
 
             
 
@@ -1204,6 +1204,10 @@ export class Instagram<PostType> {
                 }
 
 
+
+                // await this.page.waitFor(3000);
+
+
                 // ┌───────────────────────────────────────────────────┐
                 // │                                                   │
                 // │    Goto original URL Request, now login done.     │
@@ -1214,7 +1218,7 @@ export class Instagram<PostType> {
                 try {
 
                     // Visit page
-                    await this.page.goto(this.url);
+                    await this.page.goto(this.url, {timeout: 3000});
 
 
                     // Wait until loaded
