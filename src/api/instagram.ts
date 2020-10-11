@@ -1084,7 +1084,11 @@ export class Instagram<PostType> {
                 // Wait 100ms to look for the Cookie Popup
                 await this.page.waitForSelector('div[role=dialog] button:first-of-type', { timeout: 3000 });
 
-                await this.page.waitFor(3000);
+                // Screenshot
+                if (this.screenshots){
+                    await this.page.screenshot({path: '/tmp/instamancer/01_beforeClickLookingForCookies.png'});
+                    this.logger.error(Date() + ", IMAGE, COOKIEACCEPT, /tmp/instamancer/01_beforeClickLookingForCookies.png" );
+                }
 
                 // Click 'accept'.
                 await this.page.click('div[role=dialog] button:first-of-type');
@@ -1095,8 +1099,8 @@ export class Instagram<PostType> {
 
                 // Screenshot
                 if (this.screenshots){
-                    await this.page.screenshot({path: '/tmp/instamancer/01_LookingForCookies.png'});
-                    this.logger.error(Date() + ", IMAGE, COOKIEACCEPT, /tmp/instamancer/01_LookingForCookies.png" );
+                    await this.page.screenshot({path: '/tmp/instamancer/01_afterClickLookingForCookies.png'});
+                    this.logger.error(Date() + ", IMAGE, COOKIEACCEPT, /tmp/instamancer/01_afterClickLookingForCookies.png" );
                 }
 
 
@@ -1120,12 +1124,17 @@ export class Instagram<PostType> {
 
                 await this.page.waitFor(3000);
 
+                
+                // Screenshot
+                if (this.screenshots){
+                    await this.page.screenshot({path: '/tmp/instamancer/02_beforeLogin.png'});
+                    this.logger.error(Date() + ", IMAGE, LOGIN, /tmp/instamancer/02_beforeLogin.png" );
+                }
+
+
+
                 // Log
                 this.logger.error(Date() + ", LOGIN, TRUE, Login Page found - attempting to use credentials." );
-
-
-                // Login found
-                // this.login = true;
 
 
                 // Check for supplied username
@@ -1160,8 +1169,8 @@ export class Instagram<PostType> {
 
                 // Screenshot
                 if (this.screenshots){
-                    await this.page.screenshot({path: '/tmp/instamancer/02_login.png'});
-                    this.logger.error(Date() + ", IMAGE, LOGIN, /tmp/instamancer/02_login.png" );
+                    await this.page.screenshot({path: '/tmp/instamancer/02_afterLogin.png'});
+                    this.logger.error(Date() + ", IMAGE, LOGIN, /tmp/instamancer/02_afterLogin.png" );
                 }
 
 
@@ -1181,8 +1190,6 @@ export class Instagram<PostType> {
 
                     // Look for button
                     await this.page.waitForSelector('button[type="button"]', { timeout: 3000 });
-                    
-                    await this.page.waitFor(3000);
 
                     // Screenshot
                     if (this.screenshots){
@@ -1196,7 +1203,7 @@ export class Instagram<PostType> {
 
 
                     // wait 500ms
-                    await this.page.waitFor(500);
+                    await this.page.waitFor(3000);
 
 
                     // log
@@ -1229,10 +1236,6 @@ export class Instagram<PostType> {
 
                     // Visit page
                     await this.page.goto(this.url, {timeout: 3000});
-
-
-                    // Wait until loaded
-                    await this.page.waitFor(3000);
                     
                     // this.logger.error(Date() + ", WAITS, TRUE, Waiting for Navigation to original page after login." );
                     // await this.page.waitForNavigation({waitUntil: 'domcontentloaded'});
