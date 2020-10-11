@@ -668,18 +668,18 @@ export class Instagram<PostType> {
         let parsed;
         try {
             
-            this.logger.error( Date.now() + ", URL, visit, visiting page : " + this.postURL + post + "/");
+            this.logger.error( Date() + ", URL, visit, visiting page : " + this.postURL + post + "/");
             await postPage.goto(this.postURL + post + "/");
-            this.logger.error( Date.now() + ", URL, visit, visiting page loaded : " + postPage.url());
+            this.logger.error( Date() + ", URL, visit, visiting page loaded : " + postPage.url());
 
             if (this.screenshots){
                 await this.page.screenshot({path: '/tmp/instamancer/06_Post_' + post + '.png'});
-                this.logger.error( Date.now() + ', Screenshot, postCaptured, /tmp/instamancer/06_Post_' + post + '.png' );
+                this.logger.error( Date() + ', Screenshot, postCaptured, /tmp/instamancer/06_Post_' + post + '.png' );
             }
 
         } catch (error) {
 
-            this.logger.error(Date.now() + ", Error, Navigate, Could not navigate to Post Page: " + this.postURL + post + "/" );
+            this.logger.error(Date() + ", Error, Navigate, Could not navigate to Post Page: " + this.postURL + post + "/" );
 
             await this.handlePostPageError(
                 postPage,
@@ -983,119 +983,278 @@ export class Instagram<PostType> {
         return true;
     }
 
+
+    // ┌─────────────────────────────────────────────────────────────────────────┐ 
+    // │                                                                         │░
+    // │                                                                         │░
+    // │                           MAIN PROCESSING                               │░
+    // │                                                                         │░
+    // │                                                                         │░
+    // └─────────────────────────────────────────────────────────────────────────┘░
+    //  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
     public async gotoPage()
     {
 
-        this.logger.error( Date.now() + ", START, process, visiting new page. ");
+        this.logger.error( Date() + ", START, TRUE, Running Instamancer.");
 
-        // New page
+        // ┌───────────────────────────────────────────────────┐
+        // │                                                   │
+        // │      Open new page and wait for it to finish      │
+        // │                                                   │
+        // └───────────────────────────────────────────────────┘
+
         this.page = await this.browser.newPage();
         await this.progress(Progress.OPENING);
 
-        // Attempt to visit URL
+        
         try {
 
+            // ┌───────────────────────────────────────────────────┐
+            // │                                                   │
+            // │                  PROXY Settings                   │
+            // │                                                   │
+            // └───────────────────────────────────────────────────┘
+
             if (this.proxyURL) {
-                this.logger.error(Date.now() + ", Proxy, url, " + this.proxyURL);
+                this.logger.error(Date() + ", PROXY, TRUE, " + this.proxyURL);
             }
+
+
+            // ┌───────────────────────────────────────────────────┐
+            // │                                                   │
+            // │             Check IP / Browser Agent              │
+            // │                                                   │
+            // └───────────────────────────────────────────────────┘
 
             if (this.screenshots){
-                this.logger.error( Date.now() + ", URL, visit, visiting page : http://atomurl.net/myip/");
+                
                 await this.page.goto('http://atomurl.net/myip/');
                 await this.page.screenshot({path: '/tmp/instamancer/00_IPConfig.png'});
-                this.logger.error( Date.now() + ", Screenshot, IPConfig, /tmp/instamancer/00_IPConfig.png");
+                this.logger.error( Date() + ", VISIT, URL, visiting page : http://atomurl.net/myip/");
+                this.logger.error( Date() + ", IMAGE, IPCONFIG, /tmp/instamancer/00_IPConfig.png");
             }
 
-            this.logger.error( Date.now() + ", URL, visit, visiting page : "+this.url);
-            await this.page.goto(this.url);
-            this.logger.error( Date.now() + ", URL, loaded, visiting page loaded : "+this.page.url());
 
-            // ┌─────────────────────────────────────────────────────────────────────────┐ 
-            // │                                                                         │░
-            // │                                                                         │░
-            // │                         CHECK FOR LOGIN PAGE                            │░
-            // │                                                                         │░
-            // │                                                                         │░
-            // └─────────────────────────────────────────────────────────────────────────┘░
-            //  ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+            // ┌───────────────────────────────────────────────────┐
+            // │                                                   │
+            // │                 Try going to page                 │
+            // │                                                   │
+            // └───────────────────────────────────────────────────┘
+
+            await this.page.goto(this.url);
+
+
+            // log
+            this.logger.error( Date() + ", VISIT, URL, visiting page : " + this.url);
+            this.logger.error( Date() + ", VISIT, FOUND, visiting page loaded : " + this.page.url());
+
+
+
+            // ┌───────────────────────────────────────────────────┐
+            // │                                                   │
+            // │               Wait for page to load               │
+            // │                                                   │
+            // └───────────────────────────────────────────────────┘
+
+            await this.page.waitForNavigation(); 
+
+
+
+            // ┌───────────────────────────────────────────────────┐
+            // │                                                   │
+            // │            Accept Cookies Popup Modal             │
+            // │                                                   │
+            // └───────────────────────────────────────────────────┘
+
             try {
 
-                /**
-                 * Accept Cookies
-                 */
-                if (this.screenshots){
-                    await this.page.screenshot({path: '/tmp/instamancer/01_LookingForCookies.png'});
-                    this.logger.error(Date.now() + ", Screenshot, cookieAccept, /tmp/instamancer/01_LookingForCookies.png" );
-                }
-                await this.page.waitForSelector('div[role=dialog] button:first-of-type', { timeout: 500 });
-                this.logger.error(Date.now() + ", Cookies, Accept, Cookie Popup found - attempting to press accept button." );
+                // Wait 100ms to look for the Cookie Popup
+                await this.page.waitForSelector('div[role=dialog] button:first-of-type', { timeout: 100 });
+
+                // Click 'accept'.
                 await this.page.click('div[role=dialog] button:first-of-type');
 
-                /**
-                 * Login Page
-                 */
-                await this.page.waitForSelector('input[name="username"]', { timeout: 2000 });
-                this.logger.error(Date.now() + ", Login, Attempt, Login Page found - attempting to use credentials." );
-                this.login = true;
+                // log
+                this.logger.error(Date() + ", POPUP, TRUE, Cookie Popup found - attempting to press accept button." );
 
-                if (this.user == '')
-                {
-                    this.logger.error(Date.now() + ", Error, Password, No Username Supplied. Exiting" );
-                    return false;
-                }
-                if (this.pass == '')
-                {
-                    this.logger.error(Date.now() + ", Error, Password, No Password Supplied. Exiting" );
-                    return false;
-                }
 
-                await this.page.type('input[name="username"]', this.user);
-                await this.page.type('input[name="password"]', this.pass);
-
-                await this.page.waitFor(100);
-                await this.page.click('button[type="submit"]');
-                await this.page.waitFor(3000);
-
+                // Screenshot
                 if (this.screenshots){
-                    await this.page.screenshot({path: '/tmp/instamancer/02_login.png'});
-                    this.logger.error(Date.now() + ", Screenshot, login, /tmp/instamancer/02_login.png" );
-                }
-
-                /**
-                 * Save Details Button
-                 */
-                await this.page.waitForSelector('button[type="button"]');
-                await this.page.click('button[type="button"]');
-                await this.page.waitFor(500);
-
-                if (this.screenshots){
-                    await this.page.screenshot({path: '/tmp/instamancer/03_SaveDetails.png'});
-                    this.logger.error(Date.now() + ", Screenshot, saveDetails, /tmp/instamancer/03_SaveDetails.png" );
-                }
-                
-                /**
-                 *  Goto original URL Request, not login page.
-                 */
-                this.logger.error( Date.now() + ", URL, visit, visiting page : "+this.url);
-                await this.page.goto(this.url);
-                this.logger.error( Date.now() + ", URL, loaded, visiting page loaded : "+this.page.url());
-
-                if (this.screenshots){
-                    await this.page.screenshot({path: '/tmp/instamancer/04_GotoFirstPage.png'});
-                    this.logger.error(Date.now() + ", Screenshot, firstPage, /tmp/instamancer/04_GotoFirstPage.png" );
+                    await this.page.screenshot({path: '/tmp/instamancer/01_LookingForCookies.png'});
+                    this.logger.error(Date() + ", IMAGE, COOKIEACCEPT, /tmp/instamancer/01_CookiesAccepted.png" );
                 }
 
 
             } catch (error) {
-                await this.page.waitFor(3000);
-                this.logger.info("No LOGIN Screen found.");
+                this.logger.error(Date() + ", POPUP, FALSE, No Cookie Popup found." );
+            }
 
+
+
+            // ┌───────────────────────────────────────────────────┐
+            // │                                                   │
+            // │               Check for Login Page                │
+            // │                                                   │
+            // └───────────────────────────────────────────────────┘
+
+            await this.page.waitForNavigation(); 
+
+            try {
+
+                // Look for Login Page
+                await this.page.waitForSelector('input[name="username"]', { timeout: 100 });
+
+
+                // Log
+                this.logger.error(Date() + ", LOGIN, TRUE, Login Page found - attempting to use credentials." );
+
+
+                // Login found
+                // this.login = true;
+
+
+                // Check for supplied username
+                if (this.user == '')
+                {
+                    this.logger.error(Date() + ", ERROR, USERNAME, No Username Supplied. Exiting" );
+                    return false;
+                }
+
+
+                // Check for supplied password
+                if (this.pass == '')
+                {
+                    this.logger.error(Date() + ", ERROR, PASSWORD, No Password Supplied. Exiting" );
+                    return false;
+                }
+
+
+                // Insert username and password
+                await this.page.type('input[name="username"]', this.user);
+                await this.page.type('input[name="password"]', this.pass);
+
+
+                // Click the submit button
+                await this.page.waitFor(100);
+                await this.page.click('button[type="submit"]');
+
+
+                // log
+                this.logger.error(Date() + ", LOGIN, TRUE, Login details entered and submitted." );
+
+
+                // Screenshot
+                if (this.screenshots){
+                    await this.page.screenshot({path: '/tmp/instamancer/02_login.png'});
+                    this.logger.error(Date() + ", IMAGE, LOGIN, /tmp/instamancer/02_login.png" );
+                }
+
+
+
+                // await this.page.waitFor(3000);
+
+            
+
+                // ┌───────────────────────────────────────────────────┐
+                // │                                                   │
+                // │               'Save details' Button               │
+                // │                                                   │
+                // └───────────────────────────────────────────────────┘
+
+                await this.page.waitForNavigation();
+
+                try {
+
+                    // Look for button
+                    await this.page.waitForSelector('button[type="button"]', { timeout: 100 });
+                    
+
+                    // Click it
+                    await this.page.click('button[type="button"]');
+
+
+                    // wait 500ms
+                    await this.page.waitFor(500);
+
+
+                    // log
+                    this.logger.error(Date() + ", SAVED, TRUE , 'Save details' button found and clicked." );
+
+                    // Screenshot
+                    if (this.screenshots){
+                        await this.page.screenshot({path: '/tmp/instamancer/03_SaveDetails.png'});
+                        this.logger.error(Date() + ", IMAGE, SAVEDETAILS, /tmp/instamancer/03_SaveDetails.png" );
+                    }
+
+                
+                } catch (error) {
+                    this.logger.error(Date() + ", SAVED, FALSE, No 'Save details' button found." );
+                }
+
+
+                // ┌───────────────────────────────────────────────────┐
+                // │                                                   │
+                // │    Goto original URL Request, now login done.     │
+                // │                                                   │
+                // └───────────────────────────────────────────────────┘
+
+                try {
+
+                    // Visit page
+                    await this.page.goto(this.url);
+
+
+                    // Wait until loaded
+                    await this.page.waitForNavigation();
+
+
+                    // Log expected / actual pages
+                    this.logger.error( Date() + ", VISIT, URL, visiting page : "+this.url);
+                    this.logger.error( Date() + ", VISIT, FOUND, visiting page loaded : "+this.page.url());
+
+
+                    // Screenshot
+                    if (this.screenshots){
+                        await this.page.screenshot({path: '/tmp/instamancer/04_GotoFirstPage.png'});
+                        this.logger.error(Date() + ", IMAGE, FIRSTPAGE, /tmp/instamancer/04_GotoFirstPage.png" );
+                    }
+
+                } catch (error) {
+                    this.logger.error(Date() + ", VISIT, FALSE, Visit page not loaded." );
+                }
+
+
+
+            // ┌───────────────────────────────────────────────────┐
+            // │                                                   │
+            // │               No Login Found. Good!               │
+            // │                                                   │
+            // └───────────────────────────────────────────────────┘ 
+            
+            } catch (error) {
+
+
+                // log
+                this.logger.error(Date() + ", LOGIN, FALSE, Login Page not found - Continuing to page." );
+
+
+                // Wait for page to load
+                await this.page.waitForNavigation(); 
+
+
+                // await this.page.waitFor(3000);
+
+
+                // Screenshot
                 if (this.screenshots){
                     await this.page.screenshot({path: '/tmp/instamancer/05_noLoginScreenFound.png'});
-                    this.logger.error(Date.now() + ", Screenshot, noLogin, /tmp/instamancer/05_noLoginScreenFound.png" );
+                    this.logger.error(Date() + ", IMAGE, NOLOGIN, /tmp/instamancer/05_noLoginScreenFound.png" );
                 }
 
             }
+
+            
 
 
             // Check page loads
