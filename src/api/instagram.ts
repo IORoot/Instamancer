@@ -1066,6 +1066,12 @@ export class Instagram<PostType> {
 
             await this.page.goto(this.url, {waitUntil: 'domcontentloaded'});
 
+            // Screenshot
+            if (this.screenshots){
+                await this.page.screenshot({path: this.screenshotPath + '/00_afterInitialPageLoaded.png'});
+                this.logger.warn(Date() + ", IMAGE, INITIALPAGE, " + this.screenshotPath + "/00_afterInitialPageLoaded.png" );
+            }
+
 
             // ┌───────────────────────────────────────────────────┐
             // │                                                   │
