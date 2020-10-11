@@ -702,12 +702,12 @@ export class Instagram<PostType> {
             }
 
             // log
-            this.logger.error(Date() + ", PASS, NAVIGATE, Captured Post Page: " + this.postURL + post + "/" );
+            this.logger.error(Date() + ", PASS, SCRAPE, Captured Post Page: " + this.postURL + post + "/" );
 
         } catch (error) {
 
             // log
-            this.logger.error(Date() + ", FAIL, NAVIGATE, Could not navigate to Post Page: " + this.postURL + post + "/" );
+            this.logger.error(Date() + ", FAIL, SCRAPE, Could not navigate to Post Page: " + this.postURL + post + "/" );
 
             await this.handlePostPageError(
                 postPage,
@@ -1274,7 +1274,9 @@ export class Instagram<PostType> {
                     }
 
                 } catch (error) {
-                    this.logger.warn(Date() + ", VISIT, FALSE, Visit page not loaded." );
+
+                    this.logger.error(Date() + ", FAIL, NAVIGATE, After a login; Could not navigate to page : " + this.url );
+                    
                 }
 
 
@@ -1341,7 +1343,12 @@ export class Instagram<PostType> {
                     }
                 }, 10000);
             });
+
+
         } catch (e) {
+
+            this.logger.error(Date() + ", FAIL, NAVIGATE, Could not navigate to page : " + this.url );
+
             await this.handleConstructionError(e, 60);
             return false;
         }
