@@ -1225,7 +1225,9 @@ export class Instagram<PostType> {
 
 
 
-                
+                // Pause for 3 seconds to allow the "save details" to process.
+                // Otherwise the page will timeout.
+                await this.page.waitFor(3000);
 
 
                 // ┌───────────────────────────────────────────────────┐
@@ -1238,7 +1240,7 @@ export class Instagram<PostType> {
                 try {
 
                     // Visit page
-                    await this.page.goto(this.url, {timeout: 3000});
+                    await this.page.goto(this.url, {waitUntil: 'domcontentloaded'});
                     
                     // this.logger.error(Date() + ", WAITS, TRUE, Waiting for Navigation to original page after login." );
                     // await this.page.waitForNavigation({waitUntil: 'domcontentloaded'});
