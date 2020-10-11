@@ -200,7 +200,7 @@ export class Instagram<PostType> {
     };
 
     // AndyP added
-    public login: boolean = false;
+    public ipconfig: boolean = false;
     // public creds;
     public endpoint;
     public screenshots;
@@ -250,7 +250,7 @@ export class Instagram<PostType> {
         this.executePlugins("construction");
 
         // ANDYP - Login detection
-        this.login = false;
+        this.ipconfig = true;
         // this.creds = creds;
         this.user = options.user;
         this.pass = options.pass;
@@ -318,6 +318,14 @@ export class Instagram<PostType> {
             this.id = a[index];
             this.url = this.endpoint.replace("[id]", a[index]);
 
+
+
+
+            // ┌───────────────────────────────────────────────────┐
+            // │                                                   │
+            // │                  Goto first page                  │
+            // │                                                   │
+            // └───────────────────────────────────────────────────┘
             await this.gotoPage();
             await this.addListeners();
 
@@ -335,6 +343,9 @@ export class Instagram<PostType> {
                     break;
                 }
             }
+
+            this.logger.error(Date() + ", ENDED, COMPLETE, Instamancer finished scrape." );
+            this.logger.error(Date() + ", -----, -----, -----" );
 
             // Close the profile page
             await this.page.close();
@@ -668,18 +679,17 @@ export class Instagram<PostType> {
         let parsed;
         try {
             
-            this.logger.error( Date() + ", URL, visit, visiting page : " + this.postURL + post + "/");
             await postPage.goto(this.postURL + post + "/");
-            this.logger.error( Date() + ", URL, visit, visiting page loaded : " + postPage.url());
+            this.logger.error( Date() + ", VISIT, URL, visiting page loaded : " + postPage.url());
 
             if (this.screenshots){
                 await this.page.screenshot({path: '/tmp/instamancer/06_Post_' + post + '.png'});
-                this.logger.error( Date() + ', Screenshot, postCaptured, /tmp/instamancer/06_Post_' + post + '.png' );
+                this.logger.error( Date() + ', IMAGE, POSTCAPTURED, /tmp/instamancer/06_Post_' + post + '.png' );
             }
 
         } catch (error) {
 
-            this.logger.error(Date() + ", Error, Navigate, Could not navigate to Post Page: " + this.postURL + post + "/" );
+            this.logger.error(Date() + ", ERROR, NAVIGATE, Could not navigate to Post Page: " + this.postURL + post + "/" );
 
             await this.handlePostPageError(
                 postPage,
@@ -1008,7 +1018,32 @@ export class Instagram<PostType> {
         await this.progress(Progress.OPENING);
 
         
+
+        // ┌───────────────────────────────────────────────────┐
+        // │                                                   │
+        // │             Check IP / Browser Agent              │
+        // │                                                   │
+        // └───────────────────────────────────────────────────┘
+
+        if (this.screenshots && this.ipconfig){
+            
+            await this.page.goto('http://atomurl.net/myip/');
+            await this.page.screenshot({path: '/tmp/instamancer/00_IPConfig.png'});
+            this.logger.error( Date() + ", VISIT, URL, visiting page : http://atomurl.net/myip/");
+            this.logger.error( Date() + ", IMAGE, IPCONFIG, /tmp/instamancer/00_IPConfig.png");
+            this.ipconfig = false;
+        }
+
         try {
+
+            // ┌───────────────────────────────────────────────────┐
+            // │                                                   │
+            // │                 Try going to page                 │
+            // │                                                   │
+            // └───────────────────────────────────────────────────┘
+
+            await this.page.goto(this.url, {waitUntil: 'domcontentloaded'});
+
 
             // ┌───────────────────────────────────────────────────┐
             // │                                                   │
@@ -1021,33 +1056,8 @@ export class Instagram<PostType> {
             }
 
 
-            // ┌───────────────────────────────────────────────────┐
-            // │                                                   │
-            // │             Check IP / Browser Agent              │
-            // │                                                   │
-            // └───────────────────────────────────────────────────┘
-
-            if (this.screenshots){
-                
-                await this.page.goto('http://atomurl.net/myip/');
-                await this.page.screenshot({path: '/tmp/instamancer/00_IPConfig.png'});
-                this.logger.error( Date() + ", VISIT, URL, visiting page : http://atomurl.net/myip/");
-                this.logger.error( Date() + ", IMAGE, IPCONFIG, /tmp/instamancer/00_IPConfig.png");
-            }
-
-
-            // ┌───────────────────────────────────────────────────┐
-            // │                                                   │
-            // │                 Try going to page                 │
-            // │                                                   │
-            // └───────────────────────────────────────────────────┘
-
-            await this.page.goto(this.url);
-
-
             // log
-            this.logger.error( Date() + ", VISIT, URL, visiting page : " + this.url);
-            this.logger.error( Date() + ", VISIT, FOUND, visiting page loaded : " + this.page.url());
+            this.logger.error( Date() + ", VISIT, URL, visited page loaded : " + this.page.url());
 
 
 
@@ -1057,7 +1067,9 @@ export class Instagram<PostType> {
             // │                                                   │
             // └───────────────────────────────────────────────────┘
 
-            await this.page.waitForNavigation(); 
+            this.logger.error(Date() + ", WAITS, TRUE, Waiting for Navigation to main page." );
+            // await this.page.waitForNavigation();
+            await this.page.waitForNavigation({ waitUntil: 'networkidle0' });
 
 
 
@@ -1067,6 +1079,7 @@ export class Instagram<PostType> {
             // │                                                   │
             // └───────────────────────────────────────────────────┘
 
+            this.logger.error(Date() + ", WAITS, TRUE, Waiting for Cookie Popup. 100ms" );
             try {
 
                 // Wait 100ms to look for the Cookie Popup
@@ -1098,8 +1111,7 @@ export class Instagram<PostType> {
             // │                                                   │
             // └───────────────────────────────────────────────────┘
 
-            await this.page.waitForNavigation(); 
-
+            this.logger.error(Date() + ", WAITS, TRUE, Waiting for Login Page. 100ms" );
             try {
 
                 // Look for Login Page
@@ -1162,8 +1174,7 @@ export class Instagram<PostType> {
                 // │                                                   │
                 // └───────────────────────────────────────────────────┘
 
-                await this.page.waitForNavigation();
-
+                this.logger.error(Date() + ", WAITS, TRUE, Waiting for Save Details Button. 100ms" );
                 try {
 
                     // Look for button
@@ -1199,6 +1210,7 @@ export class Instagram<PostType> {
                 // │                                                   │
                 // └───────────────────────────────────────────────────┘
 
+                this.logger.error(Date() + ", WAITS, TRUE, Waiting to goto URL page now login done." );
                 try {
 
                     // Visit page
@@ -1206,12 +1218,12 @@ export class Instagram<PostType> {
 
 
                     // Wait until loaded
+                    this.logger.error(Date() + ", WAITS, TRUE, Waiting for Navigation to original page after login." );
                     await this.page.waitForNavigation();
 
 
                     // Log expected / actual pages
-                    this.logger.error( Date() + ", VISIT, URL, visiting page : "+this.url);
-                    this.logger.error( Date() + ", VISIT, FOUND, visiting page loaded : "+this.page.url());
+                    this.logger.error( Date() + ", VISIT, URL, visited page loaded : "+this.page.url());
 
 
                     // Screenshot
@@ -1239,13 +1251,6 @@ export class Instagram<PostType> {
                 this.logger.error(Date() + ", LOGIN, FALSE, Login Page not found - Continuing to page." );
 
 
-                // Wait for page to load
-                await this.page.waitForNavigation(); 
-
-
-                // await this.page.waitFor(3000);
-
-
                 // Screenshot
                 if (this.screenshots){
                     await this.page.screenshot({path: '/tmp/instamancer/05_noLoginScreenFound.png'});
@@ -1254,7 +1259,7 @@ export class Instagram<PostType> {
 
             }
 
-            
+
 
 
             // Check page loads
