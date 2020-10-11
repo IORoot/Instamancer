@@ -1186,7 +1186,7 @@ export class Instagram<PostType> {
 
                     // Screenshot
                     if (this.screenshots){
-                        await this.page.screenshot({path: '/tmp/instamancer/03_SaveDetails.png'});
+                        await this.page.screenshot({path: '/tmp/instamancer/03_BeforeClickSaveDetails.png'});
                         this.logger.error(Date() + ", IMAGE, SAVEDETAILS, /tmp/instamancer/03_BeforeClickSaveDetails.png" );
                     }
 
@@ -1204,7 +1204,7 @@ export class Instagram<PostType> {
 
                     // Screenshot
                     if (this.screenshots){
-                        await this.page.screenshot({path: '/tmp/instamancer/03_SaveDetails.png'});
+                        await this.page.screenshot({path: '/tmp/instamancer/03_AfterClickSaveDetails.png'});
                         this.logger.error(Date() + ", IMAGE, SAVEDETAILS, /tmp/instamancer/03_AfterClickSaveDetails.png" );
                     }
 
