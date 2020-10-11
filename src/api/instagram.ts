@@ -77,6 +77,9 @@ export class Instagram<PostType> {
         if (options.screenshots === undefined) {
             options.screenshots = false;
         }
+        if (options.screenshotPath === undefined) {
+            options.screenshotPath = '/tmp/instamancer';
+        }
         if (options.user === undefined) {
             options.user = '';
         }
@@ -206,6 +209,7 @@ export class Instagram<PostType> {
     public screenshots;
     public user;
     public pass;
+    public screenshotPath: string = "/tmp/instamancer";
 
     /**
      * Create API wrapper instance
@@ -256,6 +260,7 @@ export class Instagram<PostType> {
         this.pass = options.pass;
         this.endpoint = endpoint;
         this.screenshots = options.screenshots;
+        this.screenshotPath = options.screenshotPath;
     }
 
     /**
@@ -697,8 +702,8 @@ export class Instagram<PostType> {
 
             // screenshot
             if (this.screenshots){
-                await this.page.screenshot({path: '/tmp/instamancer/06_Post_' + post + '.png'});
-                this.logger.warn( Date() + ', IMAGE, POSTCAPTURED, /tmp/instamancer/06_Post_' + post + '.png' );
+                await this.page.screenshot({path: this.screenshotPath + '/06_Post_' + post + '.png'});
+                this.logger.warn( Date() + ', IMAGE, POSTCAPTURED, ' + this.screenshotPath + '/06_Post_' + post + '.png' );
             }
 
             // log
@@ -1045,9 +1050,9 @@ export class Instagram<PostType> {
         if (this.screenshots && this.ipconfig){
             
             await this.page.goto('http://atomurl.net/myip/');
-            await this.page.screenshot({path: '/tmp/instamancer/00_IPConfig.png'});
+            await this.page.screenshot({path: this.screenshotPath + '/00_IPConfig.png'});
             this.logger.warn( Date() + ", VISIT, URL, visiting page : http://atomurl.net/myip/");
-            this.logger.warn( Date() + ", IMAGE, IPCONFIG, /tmp/instamancer/00_IPConfig.png");
+            this.logger.warn( Date() + ", IMAGE, IPCONFIG, " + this.screenshotPath + "/00_IPConfig.png");
             this.ipconfig = false;
         }
 
@@ -1103,8 +1108,8 @@ export class Instagram<PostType> {
 
                 // Screenshot
                 if (this.screenshots){
-                    await this.page.screenshot({path: '/tmp/instamancer/01_beforeClickLookingForCookies.png'});
-                    this.logger.warn(Date() + ", IMAGE, COOKIEACCEPT, /tmp/instamancer/01_beforeClickLookingForCookies.png" );
+                    await this.page.screenshot({path: this.screenshotPath + '/01_beforeClickLookingForCookies.png'});
+                    this.logger.warn(Date() + ", IMAGE, COOKIEACCEPT, " + this.screenshotPath + "/01_beforeClickLookingForCookies.png" );
                 }
 
                 // Click 'accept'.
@@ -1116,8 +1121,8 @@ export class Instagram<PostType> {
 
                 // Screenshot
                 if (this.screenshots){
-                    await this.page.screenshot({path: '/tmp/instamancer/01_afterClickLookingForCookies.png'});
-                    this.logger.warn(Date() + ", IMAGE, COOKIEACCEPT, /tmp/instamancer/01_afterClickLookingForCookies.png" );
+                    await this.page.screenshot({path: this.screenshotPath + '/01_afterClickLookingForCookies.png'});
+                    this.logger.warn(Date() + ", IMAGE, COOKIEACCEPT, " + this.screenshotPath + "/01_afterClickLookingForCookies.png" );
                 }
 
 
@@ -1144,8 +1149,8 @@ export class Instagram<PostType> {
                 
                 // Screenshot
                 if (this.screenshots){
-                    await this.page.screenshot({path: '/tmp/instamancer/02_beforeLogin.png'});
-                    this.logger.warn(Date() + ", IMAGE, LOGIN, /tmp/instamancer/02_beforeLogin.png" );
+                    await this.page.screenshot({path: this.screenshotPath + '/02_beforeLogin.png'});
+                    this.logger.warn(Date() + ", IMAGE, LOGIN, " + this.screenshotPath + "/02_beforeLogin.png" );
                 }
 
 
@@ -1186,8 +1191,8 @@ export class Instagram<PostType> {
 
                 // Screenshot
                 if (this.screenshots){
-                    await this.page.screenshot({path: '/tmp/instamancer/02_afterLogin.png'});
-                    this.logger.warn(Date() + ", IMAGE, LOGIN, /tmp/instamancer/02_afterLogin.png" );
+                    await this.page.screenshot({path: this.screenshotPath + '/02_afterLogin.png'});
+                    this.logger.warn(Date() + ", IMAGE, LOGIN, " + this.screenshotPath + "/02_afterLogin.png" );
                 }
 
 
@@ -1213,8 +1218,8 @@ export class Instagram<PostType> {
 
                     // Screenshot
                     if (this.screenshots){
-                        await this.page.screenshot({path: '/tmp/instamancer/03_BeforeClickSaveDetails.png'});
-                        this.logger.warn(Date() + ", IMAGE, SAVEDETAILS, /tmp/instamancer/03_BeforeClickSaveDetails.png" );
+                        await this.page.screenshot({path: this.screenshotPath + '/03_BeforeClickSaveDetails.png'});
+                        this.logger.warn(Date() + ", IMAGE, SAVEDETAILS, " + this.screenshotPath + "/03_BeforeClickSaveDetails.png" );
                     }
 
 
@@ -1231,8 +1236,8 @@ export class Instagram<PostType> {
 
                     // Screenshot
                     if (this.screenshots){
-                        await this.page.screenshot({path: '/tmp/instamancer/03_AfterClickSaveDetails.png'});
-                        this.logger.warn(Date() + ", IMAGE, SAVEDETAILS, /tmp/instamancer/03_AfterClickSaveDetails.png" );
+                        await this.page.screenshot({path: this.screenshotPath + '/03_AfterClickSaveDetails.png'});
+                        this.logger.warn(Date() + ", IMAGE, SAVEDETAILS, " + this.screenshotPath + "/03_AfterClickSaveDetails.png" );
                     }
 
                 
@@ -1269,14 +1274,14 @@ export class Instagram<PostType> {
 
                     // Screenshot
                     if (this.screenshots){
-                        await this.page.screenshot({path: '/tmp/instamancer/04_GotoFirstPage.png'});
-                        this.logger.warn(Date() + ", IMAGE, FIRSTPAGE, /tmp/instamancer/04_GotoFirstPage.png" );
+                        await this.page.screenshot({path: this.screenshotPath + '/04_GotoFirstPage.png'});
+                        this.logger.warn(Date() + ", IMAGE, FIRSTPAGE, " + this.screenshotPath + "/04_GotoFirstPage.png" );
                     }
 
                 } catch (error) {
 
                     this.logger.error(Date() + ", FAIL, NAVIGATE, After a login; Could not navigate to page : " + this.url );
-                    
+
                 }
 
 
@@ -1296,8 +1301,8 @@ export class Instagram<PostType> {
 
                 // Screenshot
                 if (this.screenshots){
-                    await this.page.screenshot({path: '/tmp/instamancer/05_noLoginScreenFound.png'});
-                    this.logger.warn(Date() + ", IMAGE, NOLOGIN, /tmp/instamancer/05_noLoginScreenFound.png" );
+                    await this.page.screenshot({path: this.screenshotPath + '/05_noLoginScreenFound.png'});
+                    this.logger.warn(Date() + ", IMAGE, NOLOGIN, " + this.screenshotPath + "/05_noLoginScreenFound.png" );
                 }
 
             }

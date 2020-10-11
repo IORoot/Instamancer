@@ -47,6 +47,7 @@ function getOptions(args, logger) {
         strict: args["strict"],
         total: args["count"],
         screenshots: args["screenshots"],
+        screenshotPath: args["screenshotPath"],
         proxyURL: args["proxyURL"],
         user: args['user'],
         pass: args['pass'],
@@ -328,6 +329,12 @@ function buildParser(args, callback) {
                 default: false,
                 describe: "Screenshots in /tmp/instamancer/",
                 group: "Extra",
+            },
+            screenshotPath: {
+                string: true,
+                default: "/tmp/instamancer",
+                describe: "Where to save the screenshots",
+                group: "Logging",
             },
             proxyURL: {
                 string: true,

@@ -68,6 +68,9 @@ export interface IOptionsCommon {
     // Take debug screenshots
     screenshots?: boolean;
 
+    // Screenshots Location
+    screenshotPath?: string;
+
     // Username
     user?: string;
 
