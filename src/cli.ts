@@ -334,7 +334,7 @@ function buildParser(args, callback) {
                 string: true,
                 default: "/tmp/instamancer",
                 describe: "Where to save the screenshots",
-                group: "Logging",
+                group: "Extra",
             },
             proxyURL: {
                 string: true,
