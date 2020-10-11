@@ -344,8 +344,8 @@ export class Instagram<PostType> {
                 }
             }
 
-            this.logger.error(Date() + ", ENDED, COMPLETE, Instamancer finished scrape." );
-            this.logger.error(Date() + ", -----, -----, -----" );
+            this.logger.warn(Date() + ", ENDED, COMPLETE, Instamancer finished scrape." );
+            this.logger.warn(Date() + ", -----, -----, -----" );
 
             // Close the profile page
             await this.page.close();
@@ -394,7 +394,7 @@ export class Instagram<PostType> {
         this.page.on("response", (res) => this.interceptResponse(res));
         this.page.on("requestfailed", (res) => this.interceptFailure(res));
         this.page.on("console", (message) =>
-            this.logger.warn("Console log", {message}),
+            this.logger.info("Console log", {message}),
         );
 
         // Ignore dialog boxes
@@ -403,7 +403,7 @@ export class Instagram<PostType> {
         // Log errors
         /* istanbul ignore next */
         this.page.on("error", (error) =>
-            this.logger.warn("Console error", {error}),
+            this.logger.info("Console error", {error}),
         );
 
         // Gather initial posts from web page
@@ -578,11 +578,11 @@ export class Instagram<PostType> {
             try {
                 data = await res.json();
                 if (typeof data !== "object") {
-                    this.logger.warn("Response data is not an object", {data});
+                    this.logger.info("Response data is not an object", {data});
                     continue;
                 }
             } catch (error) {
-                this.logger.warn("Error processing response JSON", {
+                this.logger.info("Error processing response JSON", {
                     data,
                     error,
                 });
@@ -594,7 +594,7 @@ export class Instagram<PostType> {
 
             // Check for rate limiting
             if (data && "status" in data && data["status"] === "fail") {
-                this.logger.warn("Rate limited");
+                this.logger.info("Rate limited");
                 this.hibernate = true;
                 continue;
             }
@@ -606,7 +606,7 @@ export class Instagram<PostType> {
                     _.get(data, this.pageQuery + ".end_cursor", false)
                 )
             ) {
-                this.logger.warn("No posts remaining", {data});
+                this.logger.info("No posts remaining", {data});
                 this.finish(FinishedReasons.API_FINISHED);
             }
 
@@ -631,7 +631,7 @@ export class Instagram<PostType> {
             // Check it hasn't already been cached
             const contains = this.postIds.add(postId);
             if (contains) {
-                this.logger.warn("Duplicate id found", {postId});
+                this.logger.info("Duplicate id found", {postId});
                 continue;
             }
 
@@ -677,19 +677,37 @@ export class Instagram<PostType> {
 
         // Visit post and read state
         let parsed;
+
+
+        // ┌───────────────────────────────────────────────────┐
+        // │                                                   │
+        // │                     Goto Post                     │
+        // │                                                   │
+        // └───────────────────────────────────────────────────┘
+
         try {
             
+            // Visit post page
             await postPage.goto(this.postURL + post + "/");
-            this.logger.error( Date() + ", VISIT, URL, visiting page loaded : " + postPage.url());
 
+
+            // log
+            this.logger.warn( Date() + ", VISIT, URL, visiting page loaded : " + postPage.url());
+
+
+            // screenshot
             if (this.screenshots){
                 await this.page.screenshot({path: '/tmp/instamancer/06_Post_' + post + '.png'});
-                this.logger.error( Date() + ', IMAGE, POSTCAPTURED, /tmp/instamancer/06_Post_' + post + '.png' );
+                this.logger.warn( Date() + ', IMAGE, POSTCAPTURED, /tmp/instamancer/06_Post_' + post + '.png' );
             }
+
+            // log
+            this.logger.error(Date() + ", PASS, NAVIGATE, Captured Post Page: " + this.postURL + post + "/" );
 
         } catch (error) {
 
-            this.logger.error(Date() + ", ERROR, NAVIGATE, Could not navigate to Post Page: " + this.postURL + post + "/" );
+            // log
+            this.logger.error(Date() + ", FAIL, NAVIGATE, Could not navigate to Post Page: " + this.postURL + post + "/" );
 
             await this.handlePostPageError(
                 postPage,
@@ -767,7 +785,6 @@ export class Instagram<PostType> {
 
             var page = "/p/" + post + "/";
             var graphql = data[page]["data"]["graphql"];
-            // this.logger.warn('GRAPHQL -- ', { graphql });
             data = JSON.stringify(graphql);
         }
 
@@ -804,7 +821,7 @@ export class Instagram<PostType> {
         retries: number,
     ) {
         // Log error and wait
-        this.logger.warn(message, {error});
+        this.logger.info(message, {error});
         await this.progress(Progress.ABORTED);
         await this.sleep(2);
 
@@ -827,7 +844,7 @@ export class Instagram<PostType> {
         }
         if (isLeft(validationResult)) {
             const validationReporter = PathReporter.report(validationResult);
-            this.logger.warn(
+            this.logger.info(
                 `
         Warning! The Instagram API has been changed since this version of instamancer was released.
         More info: https://scriptsmith.github.io/instamancer/api-change
@@ -885,7 +902,7 @@ export class Instagram<PostType> {
                         // No content
                     }
 
-                    this.logger.warn(
+                    this.logger.info(
                         "Page failed to make requests",
                         pageContent,
                     );
@@ -1006,7 +1023,7 @@ export class Instagram<PostType> {
     public async gotoPage()
     {
 
-        this.logger.error( Date() + ", START, TRUE, Running Instamancer.");
+        this.logger.warn( Date() + ", START, TRUE, Running Instamancer.");
 
         // ┌───────────────────────────────────────────────────┐
         // │                                                   │
@@ -1029,8 +1046,8 @@ export class Instagram<PostType> {
             
             await this.page.goto('http://atomurl.net/myip/');
             await this.page.screenshot({path: '/tmp/instamancer/00_IPConfig.png'});
-            this.logger.error( Date() + ", VISIT, URL, visiting page : http://atomurl.net/myip/");
-            this.logger.error( Date() + ", IMAGE, IPCONFIG, /tmp/instamancer/00_IPConfig.png");
+            this.logger.warn( Date() + ", VISIT, URL, visiting page : http://atomurl.net/myip/");
+            this.logger.warn( Date() + ", IMAGE, IPCONFIG, /tmp/instamancer/00_IPConfig.png");
             this.ipconfig = false;
         }
 
@@ -1052,12 +1069,12 @@ export class Instagram<PostType> {
             // └───────────────────────────────────────────────────┘
 
             if (this.proxyURL) {
-                this.logger.error(Date() + ", PROXY, TRUE, " + this.proxyURL);
+                this.logger.warn(Date() + ", PROXY, TRUE, " + this.proxyURL);
             }
 
 
             // log
-            this.logger.error( Date() + ", VISIT, URL, visited page loaded : " + this.page.url());
+            this.logger.warn( Date() + ", VISIT, URL, visited page loaded : " + this.page.url());
 
 
 
@@ -1067,7 +1084,7 @@ export class Instagram<PostType> {
             // │                                                   │
             // └───────────────────────────────────────────────────┘
 
-            this.logger.error(Date() + ", WAITS, TRUE, Waiting for Navigation to main page." );
+            this.logger.warn(Date() + ", WAITS, TRUE, Waiting for Navigation to main page." );
             await this.page.waitForNavigation({ waitUntil: 'networkidle0' });
 
 
@@ -1078,7 +1095,7 @@ export class Instagram<PostType> {
             // │                                                   │
             // └───────────────────────────────────────────────────┘
 
-            this.logger.error(Date() + ", WAITS, TRUE, Waiting for Cookie Popup. 100ms" );
+            this.logger.warn(Date() + ", WAITS, TRUE, Waiting for Cookie Popup. 100ms" );
             try {
 
                 // Wait 100ms to look for the Cookie Popup
@@ -1087,25 +1104,25 @@ export class Instagram<PostType> {
                 // Screenshot
                 if (this.screenshots){
                     await this.page.screenshot({path: '/tmp/instamancer/01_beforeClickLookingForCookies.png'});
-                    this.logger.error(Date() + ", IMAGE, COOKIEACCEPT, /tmp/instamancer/01_beforeClickLookingForCookies.png" );
+                    this.logger.warn(Date() + ", IMAGE, COOKIEACCEPT, /tmp/instamancer/01_beforeClickLookingForCookies.png" );
                 }
 
                 // Click 'accept'.
                 await this.page.click('div[role=dialog] button:first-of-type');
 
                 // log
-                this.logger.error(Date() + ", POPUP, TRUE, Cookie Popup found - attempting to press accept button." );
+                this.logger.warn(Date() + ", POPUP, TRUE, Cookie Popup found - attempting to press accept button." );
 
 
                 // Screenshot
                 if (this.screenshots){
                     await this.page.screenshot({path: '/tmp/instamancer/01_afterClickLookingForCookies.png'});
-                    this.logger.error(Date() + ", IMAGE, COOKIEACCEPT, /tmp/instamancer/01_afterClickLookingForCookies.png" );
+                    this.logger.warn(Date() + ", IMAGE, COOKIEACCEPT, /tmp/instamancer/01_afterClickLookingForCookies.png" );
                 }
 
 
             } catch (error) {
-                this.logger.error(Date() + ", POPUP, FALSE, No Cookie Popup found." );
+                this.logger.warn(Date() + ", POPUP, FALSE, No Cookie Popup found." );
             }
 
 
@@ -1116,7 +1133,7 @@ export class Instagram<PostType> {
             // │                                                   │
             // └───────────────────────────────────────────────────┘
 
-            this.logger.error(Date() + ", WAITS, TRUE, Waiting for Login Page. 100ms" );
+            this.logger.warn(Date() + ", WAITS, TRUE, Waiting for Login Page. 100ms" );
             try {
 
                 // Look for Login Page
@@ -1128,19 +1145,19 @@ export class Instagram<PostType> {
                 // Screenshot
                 if (this.screenshots){
                     await this.page.screenshot({path: '/tmp/instamancer/02_beforeLogin.png'});
-                    this.logger.error(Date() + ", IMAGE, LOGIN, /tmp/instamancer/02_beforeLogin.png" );
+                    this.logger.warn(Date() + ", IMAGE, LOGIN, /tmp/instamancer/02_beforeLogin.png" );
                 }
 
 
 
                 // Log
-                this.logger.error(Date() + ", LOGIN, TRUE, Login Page found - attempting to use credentials." );
+                this.logger.warn(Date() + ", LOGIN, TRUE, Login Page found - attempting to use credentials." );
 
 
                 // Check for supplied username
                 if (this.user == '')
                 {
-                    this.logger.error(Date() + ", ERROR, USERNAME, No Username Supplied. Exiting" );
+                    this.logger.error(Date() + ", FAIL, USERNAME, No Username Supplied. Exiting" );
                     return false;
                 }
 
@@ -1148,7 +1165,7 @@ export class Instagram<PostType> {
                 // Check for supplied password
                 if (this.pass == '')
                 {
-                    this.logger.error(Date() + ", ERROR, PASSWORD, No Password Supplied. Exiting" );
+                    this.logger.error(Date() + ", FAIL, PASSWORD, No Password Supplied. Exiting" );
                     return false;
                 }
 
@@ -1164,13 +1181,13 @@ export class Instagram<PostType> {
 
 
                 // log
-                this.logger.error(Date() + ", LOGIN, TRUE, Login details entered and submitted." );
+                this.logger.warn(Date() + ", LOGIN, TRUE, Login details entered and submitted." );
 
 
                 // Screenshot
                 if (this.screenshots){
                     await this.page.screenshot({path: '/tmp/instamancer/02_afterLogin.png'});
-                    this.logger.error(Date() + ", IMAGE, LOGIN, /tmp/instamancer/02_afterLogin.png" );
+                    this.logger.warn(Date() + ", IMAGE, LOGIN, /tmp/instamancer/02_afterLogin.png" );
                 }
 
 
@@ -1188,7 +1205,7 @@ export class Instagram<PostType> {
                 // │                                                   │
                 // └───────────────────────────────────────────────────┘
 
-                this.logger.error(Date() + ", WAITS, TRUE, Waiting for Save Details Button. 100ms" );
+                this.logger.warn(Date() + ", WAITS, TRUE, Waiting for Save Details Button. 100ms" );
                 try {
 
                     // Look for button
@@ -1197,7 +1214,7 @@ export class Instagram<PostType> {
                     // Screenshot
                     if (this.screenshots){
                         await this.page.screenshot({path: '/tmp/instamancer/03_BeforeClickSaveDetails.png'});
-                        this.logger.error(Date() + ", IMAGE, SAVEDETAILS, /tmp/instamancer/03_BeforeClickSaveDetails.png" );
+                        this.logger.warn(Date() + ", IMAGE, SAVEDETAILS, /tmp/instamancer/03_BeforeClickSaveDetails.png" );
                     }
 
 
@@ -1210,17 +1227,17 @@ export class Instagram<PostType> {
 
 
                     // log
-                    this.logger.error(Date() + ", SAVED, TRUE , 'Save details' button found and clicked." );
+                    this.logger.warn(Date() + ", SAVED, TRUE , 'Save details' button found and clicked." );
 
                     // Screenshot
                     if (this.screenshots){
                         await this.page.screenshot({path: '/tmp/instamancer/03_AfterClickSaveDetails.png'});
-                        this.logger.error(Date() + ", IMAGE, SAVEDETAILS, /tmp/instamancer/03_AfterClickSaveDetails.png" );
+                        this.logger.warn(Date() + ", IMAGE, SAVEDETAILS, /tmp/instamancer/03_AfterClickSaveDetails.png" );
                     }
 
                 
                 } catch (error) {
-                    this.logger.error(Date() + ", SAVED, FALSE, No 'Save details' button found." );
+                    this.logger.warn(Date() + ", SAVED, FALSE, No 'Save details' button found." );
                 }
 
 
@@ -1236,28 +1253,28 @@ export class Instagram<PostType> {
                 // │                                                   │
                 // └───────────────────────────────────────────────────┘
 
-                this.logger.error(Date() + ", WAITS, TRUE, Waiting to goto URL page now login done." );
+                this.logger.warn(Date() + ", WAITS, TRUE, Waiting to goto URL page now login done." );
                 try {
 
                     // Visit page
                     await this.page.goto(this.url, {waitUntil: 'domcontentloaded'});
                     
-                    // this.logger.error(Date() + ", WAITS, TRUE, Waiting for Navigation to original page after login." );
+                    // this.logger.warn(Date() + ", WAITS, TRUE, Waiting for Navigation to original page after login." );
                     // await this.page.waitForNavigation({waitUntil: 'domcontentloaded'});
 
 
                     // Log expected / actual pages
-                    this.logger.error( Date() + ", VISIT, URL, visited page loaded : "+this.page.url());
+                    this.logger.warn( Date() + ", VISIT, URL, visited page loaded : "+this.page.url());
 
 
                     // Screenshot
                     if (this.screenshots){
                         await this.page.screenshot({path: '/tmp/instamancer/04_GotoFirstPage.png'});
-                        this.logger.error(Date() + ", IMAGE, FIRSTPAGE, /tmp/instamancer/04_GotoFirstPage.png" );
+                        this.logger.warn(Date() + ", IMAGE, FIRSTPAGE, /tmp/instamancer/04_GotoFirstPage.png" );
                     }
 
                 } catch (error) {
-                    this.logger.error(Date() + ", VISIT, FALSE, Visit page not loaded." );
+                    this.logger.warn(Date() + ", VISIT, FALSE, Visit page not loaded." );
                 }
 
 
@@ -1272,13 +1289,13 @@ export class Instagram<PostType> {
 
 
                 // log
-                this.logger.error(Date() + ", LOGIN, FALSE, Login Page not found - Continuing to page." );
+                this.logger.warn(Date() + ", LOGIN, FALSE, Login Page not found - Continuing to page." );
 
 
                 // Screenshot
                 if (this.screenshots){
                     await this.page.screenshot({path: '/tmp/instamancer/05_noLoginScreenFound.png'});
-                    this.logger.error(Date() + ", IMAGE, NOLOGIN, /tmp/instamancer/05_noLoginScreenFound.png" );
+                    this.logger.warn(Date() + ", IMAGE, NOLOGIN, /tmp/instamancer/05_noLoginScreenFound.png" );
                 }
 
             }
@@ -1320,7 +1337,7 @@ export class Instagram<PostType> {
                     try {
                         document.body.style.overflow = "";
                     } catch (error) {
-                        this.logger.warn("Failed to update style", {error});
+                        this.logger.info("Failed to update style", {error});
                     }
                 }, 10000);
             });
@@ -1342,7 +1359,7 @@ export class Instagram<PostType> {
      */
     private async handleConstructionError(error: string, timeout: number) {
         // Log error and wait
-        this.logger.warn("Construction error", {error, url: this.url});
+        this.logger.info("Construction error", {error, url: this.url});
         await this.progress(Progress.ABORTED);
         await this.sleep(timeout);
 
@@ -1423,7 +1440,7 @@ export class Instagram<PostType> {
         );
         const indexStr = chalk.bgWhite.black(` Scraped: ${this.index} `);
 
-        this.logger.warn({
+        this.logger.info({
             id: this.id,
             index: this.index,
             sleepRemaining: this.sleepRemaining,
@@ -1468,7 +1485,7 @@ export class Instagram<PostType> {
      * Log failed requests
      */
     private async interceptFailure(req: Request) {
-        this.logger.warn("Failed request", {url: req.url()});
+        this.logger.info("Failed request", {url: req.url()});
         await this.progress(Progress.ABORTED);
     }
 
