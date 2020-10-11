@@ -1175,7 +1175,10 @@ export class Instagram<PostType> {
 
 
 
-                
+                // Pause for 3 seconds to allow the login to process.
+                // Otherwise the "Save Details" button will not be 
+                // available yet.
+                await this.page.waitFor(3000);
 
             
 
@@ -1203,7 +1206,7 @@ export class Instagram<PostType> {
 
 
                     // wait 500ms
-                    await this.page.waitFor(3000);
+                    await this.page.waitFor(500);
 
 
                     // log
