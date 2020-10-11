@@ -1205,7 +1205,7 @@ export class Instagram<PostType> {
 
 
 
-                // await this.page.waitFor(3000);
+                
 
 
                 // ┌───────────────────────────────────────────────────┐
@@ -1222,8 +1222,9 @@ export class Instagram<PostType> {
 
 
                     // Wait until loaded
-                    this.logger.error(Date() + ", WAITS, TRUE, Waiting for Navigation to original page after login." );
-                    await this.page.waitForNavigation({waitUntil: 'domcontentloaded'});
+                    // await this.page.waitFor(3000);
+                    // this.logger.error(Date() + ", WAITS, TRUE, Waiting for Navigation to original page after login." );
+                    // await this.page.waitForNavigation({waitUntil: 'domcontentloaded'});
 
 
                     // Log expected / actual pages
