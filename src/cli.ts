@@ -302,7 +302,7 @@ function buildParser(args, callback) {
             logging: {
                 alias: ["l"],
                 default: "none",
-                choices: ["none", "error", "info", "debug"],
+                choices: ["none", "error", "warn", "info", "debug"],
                 group: "Logging",
             },
             logfile: {

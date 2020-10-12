@@ -1064,13 +1064,36 @@ export class Instagram<PostType> {
             // │                                                   │
             // └───────────────────────────────────────────────────┘
 
-            await this.page.goto(this.url, {waitUntil: 'domcontentloaded'});
+            const response = await this.page.goto(this.url, {waitUntil: 'domcontentloaded'});
+
+            
+            this.logger.error(Date() + ", PAGE, RESPONSE CODE, " + response.status());
+
+
+            // ┌───────────────────────────────────────────────────┐
+            // │                                                   │
+            // │                 Rate Limit Check                  │
+            // │                                                   │
+            // └───────────────────────────────────────────────────┘
+
+            if ( response.status() !== 200)
+            {
+                this.logger.error(Date() + ", RATE, LIMITED - STOPPING, " + response.status());
+                await this.handleConstructionError(
+                    "RATE LIMITED",
+                    10,
+                );
+                return false;
+            }
+
 
             // Screenshot
             if (this.screenshots){
                 await this.page.screenshot({path: this.screenshotPath + '/00_afterInitialPageLoaded.png'});
                 this.logger.warn(Date() + ", IMAGE, INITIALPAGE, " + this.screenshotPath + "/00_afterInitialPageLoaded.png" );
             }
+
+            
 
 
             // ┌───────────────────────────────────────────────────┐
@@ -1087,16 +1110,6 @@ export class Instagram<PostType> {
             // log
             this.logger.warn( Date() + ", VISIT, URL, visited page loaded : " + this.page.url());
 
-
-
-            // ┌───────────────────────────────────────────────────┐
-            // │                                                   │
-            // │               Wait for page to load               │
-            // │                                                   │
-            // └───────────────────────────────────────────────────┘
-
-            this.logger.warn(Date() + ", WAITS, TRUE, Waiting for Navigation to main page." );
-            await this.page.waitForNavigation({ waitUntil: 'networkidle0' });
 
 
 
