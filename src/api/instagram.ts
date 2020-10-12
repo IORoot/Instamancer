@@ -1120,6 +1120,12 @@ export class Instagram<PostType> {
             // └───────────────────────────────────────────────────┘
 
             this.logger.warn(Date() + ", WAITS, TRUE, Waiting for Cookie Popup. 100ms" );
+
+            // Screenshot
+            if (this.screenshots){
+                await this.page.screenshot({path: this.screenshotPath + '/01_BeforeLookForCookiePopup.png'});
+            }
+
             try {
 
                 // Wait 100ms to look for the Cookie Popup
@@ -1158,6 +1164,12 @@ export class Instagram<PostType> {
             // └───────────────────────────────────────────────────┘
 
             this.logger.warn(Date() + ", WAITS, TRUE, Waiting for Login Page. 100ms" );
+
+            // Screenshot
+            if (this.screenshots){
+                await this.page.screenshot({path: this.screenshotPath + '/02_BeforeLookForLogin.png'});
+            }
+
             try {
 
                 // Look for Login Page
@@ -1230,6 +1242,12 @@ export class Instagram<PostType> {
                 // └───────────────────────────────────────────────────┘
 
                 this.logger.warn(Date() + ", WAITS, TRUE, Waiting for Save Details Button. 100ms" );
+
+                // Screenshot
+                if (this.screenshots){
+                    await this.page.screenshot({path: this.screenshotPath + '/03_BeforeSaveDetails.png'});
+                }
+
                 try {
 
                     // Look for button
@@ -1278,6 +1296,12 @@ export class Instagram<PostType> {
                 // └───────────────────────────────────────────────────┘
 
                 this.logger.warn(Date() + ", WAITS, TRUE, Waiting to goto URL page now login done." );
+
+                // Screenshot
+                if (this.screenshots){
+                    await this.page.screenshot({path: this.screenshotPath + '/04_BeforeGotoFirstPage.png'});
+                }
+
                 try {
 
                     // Visit page
