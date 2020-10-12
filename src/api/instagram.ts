@@ -1282,17 +1282,17 @@ export class Instagram<PostType> {
 
                     // Visit page
                     await this.page.goto(this.url, {waitUntil: 'domcontentloaded'});
-                    
-                    // this.logger.warn(Date() + ", WAITS, TRUE, Waiting for Navigation to original page after login." );
-                    // await this.page.waitForNavigation({waitUntil: 'domcontentloaded'});
 
 
                     // Log expected / actual pages
                     this.logger.warn( Date() + ", VISIT, URL, visited page loaded : "+this.page.url());
 
+                    
 
                     // Screenshot
                     if (this.screenshots){
+                        // Pause for 3 seconds before screenshot
+                        await this.page.waitFor(3000);
                         await this.page.screenshot({path: this.screenshotPath + '/04_GotoFirstPage.png'});
                         this.logger.warn(Date() + ", IMAGE, FIRSTPAGE, " + this.screenshotPath + "/04_GotoFirstPage.png" );
                     }
