@@ -1,16 +1,22 @@
+
+<div id="top"></div>
+
+<div align="center">
+
+<img src="https://svg-rewriter.sachinraja.workers.dev/?url=https%3A%2F%2Fcdn.jsdelivr.net%2Fnpm%2F%40mdi%2Fsvg%406.7.96%2Fsvg%2Finstagram.svg&fill=%23E4405F&width=200px&height=200px" style="width:200px;"/>
+
+<h3 align="center">Instagram Scraper built upon Instamancer.</h3>
+
 <p align="center">
-<img src="assets/logo.png" height="150" title="Icon made by Freepik (www.freepik.com) available at www.flaticon.com. CC 3.0 BY licensed (http://creativecommons.org/licenses/by/3.0/)">
+This project is a fork of Instamancer that adds login dectection, single browser and multiple user functionality.
+</p>    
+</div>
+
+<p align="center">
+<img src="assets/logo.png" height="150" title="Icon made by Freepik (www.freepik.com) available at www.flaticon.com. CC 3.0 BY licensed (http://creativecommons.org/licenses/by/3.0/)"/>
 </p>
 
 <h1 align="center">Instamancer+</h1>
-
-[![Build Status](https://img.shields.io/gitlab/pipeline/scriptsmith/instamancer)](https://gitlab.com/ScriptSmith/instamancer/pipelines)
-[![Quality](https://img.shields.io/codacy/grade/98066a13fa444845aa3902d180581b86.svg)](https://app.codacy.com/project/ScriptSmith/instamancer/dashboard)
-[![Coverage](https://img.shields.io/codacy/coverage/98066a13fa444845aa3902d180581b86.svg)](https://app.codacy.com/project/ScriptSmith/instamancer/dashboard)
-[![Speed](https://firebasestorage.googleapis.com/v0/b/instagram-speed-test.appspot.com/o/instamancer.svg?alt=media&token=dcc3e623-ee88-4d74-ae86-2d969a1cd8ad)](https://scriptsmith.github.io/instagram-speed-test)
-[![NPM](https://img.shields.io/npm/v/instamancer.svg)](https://www.npmjs.com/package/instamancer)
-[![Dependencies](https://david-dm.org/scriptsmith/instamancer/status.svg)](https://david-dm.org/scriptsmith/instamancer)
-[![Chat](https://img.shields.io/gitter/room/instamancer/instamancer.svg)](https://gitter.im/instamancer)
 
 Scrape Instagram's API with Puppeteer. Now with login detection.
 
